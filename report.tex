@@ -22,6 +22,72 @@
 \section{Work completed in the third year}
 \label{sec:work}
 
+\subsection{Typed AppPAL}
+\label{sec:types}
+
+As part of SecPAL's safety condition all variables in an assertions head must be
+used in the body.  When trying to describe policies we found a common pattern is
+to give a person who satisfied some property (for example they were a staff
+member) the ability to say statements about apps.
+For example, Alice might be willing to let her friends say what apps are
+suitable for her children.  This could be expressed in SecPAL as follows:
+\begin{lstlisting}
+'alice' says Friend can-say
+  App isSuitableFor(Child)
+  if Friend isFriend,
+     App isApp,
+     Child isChild.
+\end{lstlisting}
+The conditionals in this assertion add unnecessary noise to the assertion. We
+know from the names of the variable what set of constants might be used to used
+to instantiate it (Alice's friends, apps or children). To avoid this noise I
+added a sugared syntax to AppPAL that allows variables to declare their
+\emph{type}.  Using the sugared notation the above statement becomes:
+\begin{lstlisting}
+'alice' says Friend:F can-say
+  App:A isSuitableFor(Child:C).
+\end{lstlisting}
+\begin{figure}
+  \newcommand{\nonterminal}[1]{$\langle$#1$\rangle$}
+  \newcommand{\terminal}[1]{\textbf{#1}}
+  \begin{tabular}{r c l}
+    \footnotesize
+    \nonterminal{E}         & $\coloneqq$ & \nonterminal{Variable} $\vert$ \terminal{'constant'} \\
+    \nonterminal{Variable}  & $\coloneqq$ & \terminal{Type}\terminal{:}\terminal{VariableName} \\
+                            & $\vert$     & \terminal{VariableName}
+  \end{tabular}
+  \caption{Changes to SecPAL's variable syntax.}
+  \label{fig:apppal-types}
+\end{figure}
+The changes to SecPAL's syntax is shown is \autoref{fig:apppal-types}.
+After an assertion has been parsed the variables with types are extracted for
+each variable a conditional is added that \texttt{VariableName \emph{is}Type},
+and the types are removed from the variables.
+
+This gives a cleaner policy language however it also means that the predicates
+used start to have some intrinsic meaning.  If a predicate starts with
+\texttt{is} then it is describing some property of the predicates subject.
+SecPAL did not require predicates follow any naming conventions, however with
+AppPAL we have started to give predicates meaning based on their name.
+
+\subsection{BYOD Policies}
+\label{sec:byod}
+
+\subsection{Automatic Analysis of Policies}
+\label{sec:lint}
+
+When examining an AppPAL policy it is natural to wonder whether the policy is as
+optimal as it could be.  Does an assertion context contain enough statements to
+use a given rule?  If there are multiple ways of deciding whether some statement
+is true or not does one rule require far less statements than any other?  Does
+one rule require only a subset of the facts of another rule, implying the second
+is redundant?
+
+
+
+\subsection{Plausible AppPAL}
+\label{sec:plausible}
+
 \section{Plan for thesis submission}
 \label{sec:thesis}
  

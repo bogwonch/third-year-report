@@ -1,0 +1,42 @@
+\ProvidesPackage{bogwonch}
+
+% Use a package if it hasn't already been loaded
+\newcommand{\includepackage}[2][]{\@ifpackageloaded{#2}{}{\usepackage[#1]{#2}}}
+
+% Nicer typography
+\includepackage{microtype}
+
+% Colors
+\includepackage[usenames,dvipsnames]{xcolor}
+
+% Source code listings
+\includepackage{listings}
+\lstset{%
+  basicstyle=\ttfamily,
+  keywordstyle=\ttfamily\slshape,
+  stringstyle=\sffamily,
+  columns=flexible,
+  tabsize=2,
+  showstringspaces=true,
+  %numbers=left,
+  breaklines=true,
+  numberstyle=\tiny\ttfamily\color{Gray},
+  commentstyle=\ttfamily\color{Gray}
+}
+\newcommand{\code}[2][]{\lstinline[breaklines=true, #1]{#2}}
+% Autoref line numebers
+\providecommand*{\lstnumberautorefname}{line}
+% SecPAL
+\lstdefinelanguage{apppal}{%
+  morekeywords={says,if,where,False,True},%
+  otherkeywords={=,0,inf,can-say,can-act-as},%
+  morestring=[b]"%
+}[keywords,comments,strings]
+\lstset{language=apppal}
+
+% Math symbols
+\includepackage{amsmath}
+\includepackage{mathtools}
+
+% Hyperlinks
+\includepackage{hyperref}
