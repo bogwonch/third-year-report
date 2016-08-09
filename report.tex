@@ -83,7 +83,167 @@ is true or not does one rule require far less statements than any other?  Does
 one rule require only a subset of the facts of another rule, implying the second
 is redundant?
 
+\subsubsection{Checking Reachability}
+Inference in AppPAL happens by collecting ground facts and constraints that satisfy rules.
+These rules are then combined to form a policy. 
+If a rule is reachable then we would expect there to be some combination of facts that could satisfy the rule.
+If there are no facts that could satisfy the rule then this suggests that the policy may be incomplete as there are policy rules that can never be satisfied.  
 
+We search for reachable assertions using the algorithm in Listing~\ref{alg:reachable}:
+it produces a set of pairs of predicates and speakers where the a pair of a speaker and a predicate indicates that that speaker may say something about that predicate.
+We search over all the assertions in the AppPAL assertion context.
+If all of an assertion's conditionals (the facts in the if part) are reachable (or it has none) then the speaker and predicate are added to the reachable set.
+If the statement is a can-say statement then we additionally check if the delegated predicate is reachable from the delegated speaker, and if so mark the delegated statement as reachable from the speaker who made the can-say statement.
+
+\begin{lstlisting}[language=Python,float,caption={Procedure for finding all reachable assertions.},label={alg:reachable}]
+def reachable(ac) -> set:
+  reachable = new set()
+  iterate = True
+  while iterate == True:
+    iterate = False
+    for assertion in ac:
+      e = a.speaker
+      p = a.predicate
+      if p.isCanSay() and (e, p) in reachable:
+        if (p.delegator, p.delegation) in reachable:
+          if for all c in a.conditions: (e, c.predicate) in reachable:
+            reachable.add((e, p.delegation))
+            iterate = True
+      else if not (e, p) in reachable:
+        if for all c in a.conditions; (e, c.predicate) in reachable:
+          reachable.add((e, p))
+          iterate = True
+  return reachable
+\end{lstlisting}
+
+\subsection{Checking Redundancy}
+
+Redundancy occurs when there are multiple rules that result in the same decision being
+made.  Rules may depend on other rules, or ground facts.  One proof ($A$) is made
+redundant by another proof ($B$) if the set of ground facts used in $B$ is a
+subset of the ground facts used in $A$. Whenever $A$ is satisfied $B$ will also
+be, but when $B$ is satisfied $A$ may not be.  Consequently $A$ is redundant as
+$B$ can be used to prove its goal with less facts.
+Formally for any goal $G$.
+\begin{align*}
+  \exists p_1 \in \text{proofs}(G).~\exists p_2 \in \text{proofs}(G).&\\
+  p_1 \not= p_2~\wedge~\text{facts}(p_1) \subset \text{facts}(p_2)&\implies G\text{ has redundant proofs.} \\
+  p_1 \not= p_2~\wedge~\text{facts}(p_1) = \text{facts}(p_2)&\implies G\text{ has equivalent proofs.}
+\end{align*}
+Additionally if two different goals ($G$ and $G^\prime$) have equivalent proofs, then we report this
+as it implies the two statements may not be independent.
+\begin{align*}
+  \exists p_1 \in \text{proofs}(G).~\exists p_2 \in \text{proofs}(G^\prime).&\\
+  \text{facts}(p_1) = \text{facts}(p_2)&\implies \text{$G$ and $G^\prime$ have equivalent proofs.}
+\end{align*}
+
+
+A simple example might be the policy shown in \autoref{fig:redundancy-graph-simple}
+Clearly the second rule makes the first redundant.  We can represent the policy
+as a graph shown opposite the policy.  The goal (shown as a blue rectangle) has two routes
+to prove it true (each shown in ellipses).  Route 1 requires that the facts
+(shown in green rectangles) \lstinline!'x' says 'y' r,! and
+\lstinline!'x' says 'y' q.!, where as route 0 only requires the
+latter fact.
+
+\begin{figure}[!H]
+  \centering
+  \begin{minipage}{0.4\linewidth}
+  \begin{lstlisting}
+'x' says 'y' p
+  if 'y' q,
+     'y' r.
+
+'x' says 'y' p
+  if 'y' q.
+  \end{lstlisting}
+  \end{minipage}
+  \begin{minipage}{0.59\linewidth}
+    \scriptsize{}
+    \def\svgwidth{\columnwidth}
+    \import{figures/}{redundancy-simple.pdf_tex}
+  \end{minipage}
+  \caption{A simple policy shown as a graph.}
+  \label{fig:redundancy-graph-simple}
+\end{figure}
+
+A more complex example is shown bellow:
+\begin{lstlisting}
+'x' says 'z' p if 'z' q.
+'x' says 'y' can-say 'z' p.
+'y' says 'z' p if 'z' q.
+'y' says 'x' can-say 'z' q.
+\end{lstlisting}
+Representing this policy as a graph we find it is more complex. Goals that
+depend on more than just green facts, are shown as black rectangles.  If a goal
+is used to prove another goal, and it itself only depends on green, ground,
+facts, then the node is marked to be flattened (red rectangle).  Its proofs are
+merged into the higher proof, and the flattened goal is removed from the higher
+proof.  This process is repeated until no more nodes can be flattened (shown
+twice in \autoref{fig:redundancy-complex}).  Once the graph is flattened we can
+identify that \lstinline!'x' says 'z' p! has a redundant means of proof (route
+0 only uses one of route 1's facts).  We can also see that all of the proofs for 
+\lstinline!'y' says 'z' q! and \lstinline!'y' says 'z' p! use the same facts.
+We report these statements as having equivalent proofs as the goals are not
+independent of each other (implying we could use less goals and still write
+equivalent policies).
+\begin{figure}[!H]
+  \centering\tiny
+  \framebox{\def\svgwidth{0.35\textwidth}1.
+  \import{figures/}{redundancy-complex-0.pdf_tex}}
+  \framebox{\def\svgwidth{0.55\textwidth}2.
+  \import{figures/}{redundancy-complex-1.pdf_tex}}
+  \framebox{\def\svgwidth{1.00\textwidth}3.
+  \import{figures/}{redundancy-complex-2.pdf_tex}}
+  \caption{Flattening a more complex policy.}
+  \label{fig:redundancy-complex}
+\end{figure}
+
+To build the graphs, each statement we might want to prove (a goal) becomes a node in the graph, its children are organised into sets of goals (a proof), where if all the goals in any set were proved true then the goal node would also become true.
+If a node has an empty set of goals to prove it is a fact.
+Once the graph has been constructed (taking into account delegation and unification with other statements), the graph is flattened by applying the flatten procedure (Listing~\ref{alg:flatten}) repeatedly until a fixed point is reached.
+When the graph has been flattened we look for redundancy by looking for goals with proofs that are subsets of their other proofs, implying that if the larger proof is true, then the shorter proof will always be true too; 
+  and different goals with identical proofs, implying that the two decisions are not independent~(Listing~\ref{alg:redundancy}).
+
+\begin{lstlisting}[language=Python,float,caption={Procedure for flattening the redundancy graph.},label={alg:flatten}]
+def flatten(graph):
+  for goal in graph.goals:
+    hoist = true
+    for proof in graph[goal]:
+      for proof_goal in proof:
+        if not proof_goal.is_fact:
+          hoist = False
+          break
+    if hoist == True:
+      hoist(graph, goal)
+
+def hoist(graph, target):
+  for parent in graph[target].parents:
+    for proof in parent.proofs:
+      if proof.uses(target):
+        for replacements in graph[target].parents:
+          parent.proofs += proof.replace(target, replacements)
+        parent.proofs -= proof
+\end{lstlisting}
+
+\begin{lstlisting}[language=Python,float,caption={Procedure to check for redundancy.},label={alg:redundancy}]
+def check_redundancy(graph) -> boolean:
+  for goal in graph.goals:
+    for a in graph[goal]:
+      for b in graph[goal]:
+        if a >= b and a.goals.subset(b.goals):
+          if b.goals.subset(a.goals):
+            warn(a+" has multiple equivalent proofs") 
+          else
+            warn(a+" has a redundant proof")
+    for other_goal in graph.goals:
+      if goal > other_goal:
+        for a in graph[goal]:
+          for b in graph[other_goal]:
+            if not (a.goals.is_empty() or b.is_empty())
+               and a.goals == b.goals:
+              warn(a+" and "+b+" have equivalent proofs")
+\end{lstlisting}
 
 \subsection{Plausible AppPAL}
 \label{sec:plausible}
