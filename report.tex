@@ -1,4 +1,4 @@
-\documentclass[a4paper]{scrartcl}
+\documentclass[a4paper]{scrartcl} 
 \usepackage{bogwonch}
 
 \title{Authorization Logic for Mobile Ecosystems}
@@ -19,8 +19,22 @@
 \section{Introduction}
 \label{sec:introduction}
 
-\section{Work completed in the third year}
+\section{Progress}
 \label{sec:work}
+
+Last year I worked on implementing AppPAL on Android, implementing a security
+knowledge base to store results from static analysis checkers and metadata about
+apps.  I surveyed (at a high level) some of the policies present in stores and
+their distribution mechanisms.  I also looked at whether users install apps
+matching their privacy preferences and presented a draft of a paper, that was
+later accepted and published~\cite{hallett_apppal_2016}.
+
+This year I proposed working on a case-study looking at BYOD policies, and
+working on a knowledge distribution protocol to define how AppPAL assertions
+should be distributed. 
+ 
+\subsection{BYOD Policies}
+\label{sec:byod}
 
 \subsection{Typed AppPAL}
 \label{sec:types}
@@ -70,9 +84,6 @@ used start to have some intrinsic meaning.  If a predicate starts with
 SecPAL did not require predicates follow any naming conventions, however with
 AppPAL we have started to give predicates meaning based on their name.
 
-\subsection{BYOD Policies}
-\label{sec:byod}
-
 \subsection{Automatic Analysis of Policies}
 \label{sec:lint}
 
@@ -84,16 +95,23 @@ one rule require only a subset of the facts of another rule, implying the second
 is redundant?
 
 \subsubsection{Checking Reachability}
-Inference in AppPAL happens by collecting ground facts and constraints that satisfy rules.
-These rules are then combined to form a policy. 
-If a rule is reachable then we would expect there to be some combination of facts that could satisfy the rule.
-If there are no facts that could satisfy the rule then this suggests that the policy may be incomplete as there are policy rules that can never be satisfied.  
 
-We search for reachable assertions using the algorithm in Listing~\ref{alg:reachable}:
-it produces a set of pairs of predicates and speakers where the a pair of a speaker and a predicate indicates that that speaker may say something about that predicate.
-We search over all the assertions in the AppPAL assertion context.
-If all of an assertion's conditionals (the facts in the if part) are reachable (or it has none) then the speaker and predicate are added to the reachable set.
-If the statement is a can-say statement then we additionally check if the delegated predicate is reachable from the delegated speaker, and if so mark the delegated statement as reachable from the speaker who made the can-say statement.
+Inference in AppPAL happens by collecting ground facts and constraints that
+satisfy rules. These rules are then combined to form a policy. If a rule is
+reachable then there would be some combination of facts that could satisfy the
+rule. If there are no facts that could satisfy the rule then this suggests that
+the policy may be incomplete as there are policy rules that can never be
+satisfied.
+
+The code in \autoref{alg:reachable} produces a set of pairs of predicates and
+speakers where the a pair of a speaker and a predicate indicates that that
+speaker may say something about that predicate. We search over all the
+assertions in the AppPAL assertion context. If all of an assertion's
+conditionals (the facts in the if part) are reachable (or it has none) then the
+speaker and predicate are added to the reachable set. If the statement is a
+can-say statement then we additionally check if the delegated predicate is
+reachable from the delegated speaker, and if so mark the delegated statement as
+reachable from the speaker who made the can-say statement.
 
 \begin{lstlisting}[language=Python,float,caption={Procedure for finding all reachable assertions.},label={alg:reachable}]
 def reachable(ac) -> set:
@@ -146,7 +164,7 @@ to prove it true (each shown in ellipses).  Route 1 requires that the facts
 \lstinline!'x' says 'y' q.!, where as route 0 only requires the
 latter fact.
 
-\begin{figure}[!H]
+\begin{figure}
   \centering
   \begin{minipage}{0.4\linewidth}
   \begin{lstlisting}
@@ -187,7 +205,7 @@ identify that \lstinline!'x' says 'z' p! has a redundant means of proof (route
 We report these statements as having equivalent proofs as the goals are not
 independent of each other (implying we could use less goals and still write
 equivalent policies).
-\begin{figure}[!H]
+\begin{figure}
   \centering\tiny
   \framebox{\def\svgwidth{0.35\textwidth}1.
   \import{figures/}{redundancy-complex-0.pdf_tex}}
@@ -199,11 +217,18 @@ equivalent policies).
   \label{fig:redundancy-complex}
 \end{figure}
 
-To build the graphs, each statement we might want to prove (a goal) becomes a node in the graph, its children are organised into sets of goals (a proof), where if all the goals in any set were proved true then the goal node would also become true.
-If a node has an empty set of goals to prove it is a fact.
-Once the graph has been constructed (taking into account delegation and unification with other statements), the graph is flattened by applying the flatten procedure (Listing~\ref{alg:flatten}) repeatedly until a fixed point is reached.
-When the graph has been flattened we look for redundancy by looking for goals with proofs that are subsets of their other proofs, implying that if the larger proof is true, then the shorter proof will always be true too; 
-  and different goals with identical proofs, implying that the two decisions are not independent~(Listing~\ref{alg:redundancy}).
+To build the graphs, each statement we might want to prove (a goal) becomes a
+node in the graph, its children are organised into sets of goals (a proof),
+where if all the goals in any set were proved true then the goal node would also
+become true. If a node has an empty set of goals to prove it is a fact. Once the
+graph has been constructed (taking into account delegation and unification with
+other statements), the graph is flattened by applying the flatten procedure
+(Listing~\ref{alg:flatten}) repeatedly until a fixed point is reached. When the
+graph has been flattened we look for redundancy by looking for goals with proofs
+that are subsets of their other proofs, implying that if the larger proof is
+true, then the shorter proof will always be true too; and different goals with
+identical proofs, implying that the two decisions are not
+independent~(Listing~\ref{alg:redundancy}).
 
 \begin{lstlisting}[language=Python,float,caption={Procedure for flattening the redundancy graph.},label={alg:flatten}]
 def flatten(graph):
@@ -248,8 +273,47 @@ def check_redundancy(graph) -> boolean:
 \subsection{Plausible AppPAL}
 \label{sec:plausible}
 
-\section{Plan for thesis submission}
+\section{Thesis Progress}
 \label{sec:thesis}
+
+\bibliographystyle{plain}
+\bibliography{report}
  
+\pagebreak
+\appendix
+\section{Thesis Outline}
+\label{sec:thesis-outline}
+
+\begin{enumerate}
+\item Introduction
+\item Background
+  \begin{enumerate}[1)]
+  \item Android and mobile OSs
+  \item App Stores
+  \item Authorization logics
+  \item SecPAL
+  \item Related Work
+  \end{enumerate}
+\item AppPAL
+  \begin{enumerate}[1)]
+  \item Why SecPAL?
+  \item Moving beyond SecPAL 
+  \item Examples of AppPAL
+  \end{enumerate}
+\item Apps and App Stores
+  \begin{enumerate}[1)]
+  \item Users and Apps
+  \item Finding Apps that fit privacy preferences
+  \item Differences in App stores
+  \item An AppPAL enhanced store
+  \end{enumerate}
+\item Reasoning about policies
+  \begin{enumerate}[1)]
+  \item Corporate policies in the workplace
+  \item Precisely comparing BYOD policies
+  \item Inferring problems with AppPAL policies automatically
+  \end{enumerate}
+\item Conclusions 
+\end{enumerate}
 
 \end{document}
