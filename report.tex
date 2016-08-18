@@ -31,10 +31,11 @@ later accepted and published~\cite{hallett_apppal_2016}.
 
 This year I proposed working on a case-study looking at BYOD policies, and
 working on a knowledge distribution protocol to define how AppPAL assertions
-should be distributed. 
- 
-\subsection{BYOD Policies}
-\label{sec:byod}
+should be distributed.  Work on the BYOD policies has resulted in a presentation
+at iFM's doctoral symposium~\cite{hallett_specifying_2016}, but there hasn't
+been progress working on a knowledge distribution protocol.  Instead there has
+been work on developing analysis tools for AppPAL policies and some though on a
+probabilistic variant of AppPAL.
 
 \subsection{Typed AppPAL}
 \label{sec:types}
@@ -83,6 +84,95 @@ used start to have some intrinsic meaning.  If a predicate starts with
 \texttt{is} then it is describing some property of the predicates subject.
 SecPAL did not require predicates follow any naming conventions, however with
 AppPAL we have started to give predicates meaning based on their name.
+
+
+\subsection{BYOD Policies}
+\label{sec:byod}
+
+Employees bringing their own devices to work is increasingly common. Around 70\%
+of all companies having some form of \ac{BYOD} scheme~\cite{schulze_byod_2016}.
+In hospitals the use of personal devices as part of patient care is particularly
+common. One survey from the UK found that around 80\% of surgical doctors were
+willing to use their personal devices for work, with 85\% regularly using them
+to look up information, and 50\% having medical apps already installed on their
+phones~\cite{patel_uk_2015}. Another from the US found similar numbers of
+physicians regularly using their devices as part of their
+work~\cite{moyer_managing_2013}.
+
+Whilst there has been plenty of work looking at how to enforce BYOD policies,
+there has been something of a push-back against automatically enforcing them.
+\ac{MDM} software can enforce some policies by blacklisting apps, and rewriting
+apps to use guarded APIs; however having an \ac{MDM} package does not guarantee a
+company's BYOD policy is enforced correctly or even enforced.  One survey of
+companies using \ac{MDM} software found that over half of them had devices that
+broke their policies within their
+networks~\cite{mobileiron_security_labs_q4_2015}.
+Whilst the majority of BYOD policies are relatively simple a report from the
+healthcare sector, where policies are typically more complex, noted that:
+\begin{quote}
+  ``an approach toward educating the users instead of trying to control the
+  technology may be more practical in the short term.''~\cite{moyer_managing_2013}
+\end{quote}
+
+The tension between \ac{MDM} software, which is relatively new, and having
+something that employees can understand has possibly led to many BYOD policies
+being published using natural language.  Whilst there has been much research on
+the \emph{technical} means to enforce them there has been little work comparing
+the natural languages of the policies in an effort to find the common idioms and
+requirements the companies want to enforce, as well as making precise
+comparisons between policies.
+
+I have taken policies from five different sources.  One is from the SANS
+institute and serves as a guide for companies seeking to implement their own
+BYOD policy, one is from HiMMS and is a guide for hospitals looking to implement
+a BYOD policy.  Another is from an NHS trust and is a complex policy describing
+how medical staff should use their own devices when dealing with patients, as
+well as BYOD concerns.  The other two are simple BYOD polices typical of what
+most companies implement and are taken from Edinburgh University and a company
+selling emergency sirens.
+
+I have used AppPAL to create a formalisation of each of the policies.
+This has helped identify common predicates used in each of the policies (\autoref{tab:byod-predicates})
+
+\begin{table}\centering\footnotesize
+  \begin{tabular}{l c c c c c p{0.45\linewidth} }
+   \toprule 
+   Predicate                    & \rotatebox{90}{Code3PSE} & \rotatebox{90}{Edinburgh} & \rotatebox{90}{HiMMS} & \rotatebox{90}{NHS} & \rotatebox{90}{SANS} & Description                                                                          \\
+   \midrule
+   \texttt{canBackupTo}         &                          & \cmark                    & \cmark                &                     &                      & Says the device may send backups to a server.                                        \\
+   \texttt{canCall}             &                          &                           &                       & \cmark              & \cmark               & Says the telephone numbers a device can call.                                        \\
+   \texttt{canConnectToAP}      &                          &                           & \cmark                &                     & \cmark               & Says a device may associate with an access point.                                    \\
+   \texttt{canConnectToNetwork} & \cmark                   &                           &                       &                     & \cmark               & Says the device may connect to a network, for example computers all within a subnet. \\
+   \texttt{canConnectToServer}  &                          &                           &                       & \cmark              & \cmark               & Says the subject (a device) can connect to a given server (identitfied by a URL).    \\
+   \texttt{canInstall}          &                          &                           &                       & \cmark              & \cmark               & Says the device may install an app.                                                  \\
+   \texttt{canMonitor}          & \cmark                   &                           &                       & \cmark              & \cmark               & Says the subject (a user) can monitor and unlock a device.                           \\
+   \texttt{canStore}            &                          &                           & \cmark                &                     & \cmark               & Says a device may store some data in permanent (non-transient) storage.              \\
+   \texttt{canUse}              &                          &                           &                       & \cmark              & \cmark               & Says a user may use a device.                                                        \\
+   \texttt{hasAcknowledged}     & \cmark                   & \cmark                    & \cmark                & \cmark              & \cmark               & Says an individual has acknoweldged a policy.                                        \\
+   \texttt{hasFeature}          &                          & \cmark                    &                       & \cmark              &                      & Says a device has a feature enabled.                                                 \\
+   \texttt{hasMet}              &                          & \cmark                    &                       & \cmark              & \cmark               & Says a something has met a given set of requirements.                                \\
+   \texttt{isActivated}         &                          &                           & \cmark                & \cmark              & \cmark               & Specifies a device has been activated for BYOD usage.                                \\
+   \texttt{isApp}               & \cmark                   &                           & \cmark                & \cmark              & \cmark               & Specifies an app.                                                                    \\
+   \texttt{isApproved}          &                          &                           & \cmark                &                     & \cmark               & Specifies that something has been vetted and approved of.                            \\
+   \texttt{isData}              & \cmark                   &                           &                       &                     & \cmark               & Specifies data.                                                                      \\
+   \texttt{isDevice}            & \cmark                   & \cmark                    & \cmark                & \cmark              & \cmark               & Specifies a device.                                                                  \\
+   \texttt{isEmployee}          & \cmark                   & \cmark                    &                       & \cmark              & \cmark               & Specifies that someone is an employee.                                               \\
+   \texttt{isEncrypted}         &                          & \cmark                    &                       & \cmark              & \cmark               & Specifies a device is encrypted.                                                     \\
+   \texttt{isFeature}           & \cmark                   &                           &                       &                     & \cmark               & Specifies a feature.                                                                 \\
+   \texttt{isInstallable}       &                          &                           &                       & \cmark              & \cmark               & Specifies an app is installable.                                                     \\
+   \texttt{isLost}              & \cmark                   &                           & \cmark                & \cmark              & \cmark               & Specifies a device is missing.                                                       \\
+   \texttt{isOwnedBy}           & \cmark                   & \cmark                    & \cmark                & \cmark              & \cmark               & Specifies something's owner.                                                         \\
+   \texttt{isSecurityLevel}     &                          &                           & \cmark                &                     & \cmark               & Specifies some data as having business sensitive information.                        \\
+   \texttt{isString}            & \cmark                   &                           &                       & \cmark              &                      & Specifies a string.                                                                  \\
+   \texttt{isTelephoneNumber}   &                          &                           &                       & \cmark              & \cmark               & Specifies a telephone number.                                                        \\
+   \texttt{mustDisable}         & \cmark                   & \cmark                    &                       & \cmark              & \cmark               & Forces the disablement of a feature (or a device).                                   \\
+   \texttt{mustInform}          & \cmark                   &                           & \cmark                & \cmark              & \cmark               & Forces someone to disclose something to someone.                                     \\
+   \texttt{mustWipe}            & \cmark                   &                           & \cmark                & \cmark              &                      & Forces a device to be erased.                                                        \\
+   \bottomrule
+  \end{tabular}
+  \caption{Summary of predicates used in multiple BYOD policies.}
+  \label{tab:byod-predicates}
+\end{table}
 
 \subsection{Automatic Analysis of Policies}
 \label{sec:lint}

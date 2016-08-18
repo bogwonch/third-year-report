@@ -12,6 +12,10 @@
 % Import files from a directory (useful for figures)
 \includepackage{import}
 
+% Acronyms
+\usepackage{acronym}
+\acrodef{MDM}{mobile device management}
+\acrodef{BYOD}{bring your own device}
 
 % Colors
 \includepackage[usenames,dvipsnames]{xcolor}
@@ -41,9 +45,19 @@
 }[keywords,comments,strings]
 \lstset{language=apppal}
 
+% Tables
+\includepackage{booktabs}
+\includepackage{longtable}
+
 % Math symbols
 \includepackage{amsmath}
 \includepackage{mathtools}
+
+% Pretty symbols
+\usepackage{amssymb}
+\usepackage{pifont}
+\newcommand{\cmark}{\ding{51}}%
+\newcommand{\xmark}{\ding{55}}%
 
 % Hyperlinks
 \includepackage{hyperref}
