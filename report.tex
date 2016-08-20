@@ -197,6 +197,32 @@ each of the policies.
   \label{tab:predicate-conventions}
 \end{table}
 
+\subsubsection*{Future Directions}
+
+I have gone as far as translating the policies, and ensuring they use
+semi-standard terms and AppPAL predicates.  I have also developed some
+rudimental tools for visualising the policies and what responsibilities each
+speaker has.  I plan to make comparisons between each of the policies and
+describe a standard set of predicates and tooling for reasoning about BYOD
+policies.  This would ideally lead to a publication, perhaps at
+iFM\footnote{Based on last year's CFP the submission date would be early January.} where
+earlier work on this was presented in their doctoral
+symposium~\cite{hallett_specifying_2016}.
+
+All the BYOD policies I have looked at make use of acknowledgments by the
+subjects of the policy that they will follow, or be aware of, certain rules.
+These are interesting as they cannot be enforced by tooling (which
+looks at technical means to prevent devices from performing actions).  These
+acknowledgments may carry certain legal responsibilities; it would be
+interesting to look at how these can be collected and the delegations of trust
+within them.
+
+I had hoped to develop some analysis tools that might spot problems with the
+policies automatically (described~in~\autoref{sec:lint}) but the current state
+of BYOD policies is that most are too simple to have problems, and the faults in
+longer policies seem to be limited to rules being duplicated or underspecified
+rather than more interesting problems.  
+
 \subsection{Automatic Analysis of Policies}
 \label{sec:lint}
 
@@ -382,6 +408,49 @@ def check_redundancy(graph) -> boolean:
                and a.goals == b.goals:
               warn(a+" and "+b+" have equivalent proofs")
 \end{lstlisting}
+
+\subsubsection*{Future Directions}
+
+I plan to develop at least one more analysis tool for checking consistency.
+AppPAL does not allow negation in policies, however by using the predicates
+described in \autoref{tab:predicate-conventions} a policy author could describe
+when a subject \emph{can} perform an action as well as when they \emph{cannot}.
+If the action described is the same then both should not be the same at the same
+time.  Implementing this could be done by searching for examples where both are
+true, but it would be interesting to see what are the ground facts that both
+predicates share (I would expect at least some typing statements) as well as
+what the facts they don't share.  At least some (or some combination) of those
+predicates should also never be true at the same time.  This may help to create
+partitions between certain facts and identify which are mutually exclusive even
+when the names would not trivially identify them.
+
+I would also like to write tooling that can check that a policy uses well named
+predicates, and that everything is documented.  In \autoref{tab:byod-predicates}
+I documented what each of the thirty predicates meant.  I would like to be able
+to have a schema that can produce these tables automatically, as well as be able to
+check that a policy only uses predicates from them.  This is technically
+trivial, but is worthwhile as it helps with documentation and can spot mistakes
+in policies, such as spelling mistakes in predicates and constants.\footnote{This is a
+  especially common when dealing with hyphens in constants.  If copied from a
+  PDF document the hyphens are sometimes changed to dashes which look identical
+  but are counted as a different character.  AppPAL supports unicode, so they
+  are parsed correctly but are different symbols.  This was an absolute
+  nightmare to debug.}
+
+In \autoref{sec:byod} I mentioned that I have tools for visualising policies.  I
+would also like to extend these to produce nicer diagrams than the Graphviz
+diagrams I currently produce which require explanation.
+
+I do not believe there is enough work here for a full paper.  If AppPAL was a
+commonly used authorization language then this might be interesting, if I framed
+it as SecPAL analysis tools (which is much better known but still somewhat
+obscure) then it might be interesting to a workshop on authorization logics or
+policy languages.   To a general crowd similar ideas have been shown with the
+XACML authorization language (which is well known if overly-complex, poorly
+specified, and undecidable).  I do believe this work is important to continue as
+it gives AppPAL policies the ability to be more than just another authorization
+language. It lets AppPAL not only describe policies in mobile ecosystems but
+potentially identify when those policies are at fault.
 
 \subsection{Plausible AppPAL}
 \label{sec:plausible}
