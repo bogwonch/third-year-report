@@ -277,8 +277,8 @@ As the policy document notes, none of the groups or committees have ever
 approved an app in practice.  If we run the reachability checker on this policy
 it reports that (amongst other information) that no app is installable.
 
-\begin{verbatim}
-$ java -jar Lint.jar --reachability example.policy
+\begin{lstlisting}
+$\$$ java -jar Lint.jar --reachability example.policy
 [I]: loaded 1/1 files of 6 assertions
 Issues identified when checking reachability.
 The following decisions may be unreachable by their speakers:
@@ -296,7 +296,7 @@ lack any statements to that effect from the delegated party:
   (via 'cacpg') 'nhs-trust' says * isUsableClinically
   (via 'igc') 'nhs-trust' says * isApproved
   (via 'mig') 'nhs-trust' says * isUsableNonClinically
-\end{verbatim}
+\end{lstlisting}
 
 As well as reporting which decisions it cannot make, it also reports the
 specific assertions as well as which decisions could be reached, but rely on
@@ -319,11 +319,11 @@ reachability checker however, we find no problems as all the decisions are now
 reachable as there is a decision about \emph{some} variable; even if that
 variable isn't useful in practice.
 
-\begin{verbatim}
-$ java -jar Lint.jar --reachability example.policy
+\begin{lstlisting}
+$\$$ java -jar Lint.jar --reachability example.policy
 [I]: loaded 1/1 files of 11 assertions
 [I]: no completeness problems
-\end{verbatim}
+\end{lstlisting}
 
 The reachability checker acts as a quick sanity checker that a policy contains
 enough facts and rules to make any decision; unlike AppPAL proper which can
