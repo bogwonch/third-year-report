@@ -147,40 +147,42 @@ policies.
 
 
 \begin{table}\centering\footnotesize
+  \newcommand{\angledtitle}[1]{\rlap{\rotatebox{30}{#1}}}
+  \sffamily
   \begin{tabular}{l c c c c c p{0.45\linewidth} }
-   \toprule 
-   Predicate                    & \rotatebox{90}{Code3PSE} & \rotatebox{90}{Edinburgh} & \rotatebox{90}{HiMMS} & \rotatebox{90}{NHS} & \rotatebox{90}{SANS} & Description                                                                          \\
-   \midrule
-   \texttt{canBackupTo}         &                          & \cmark                    & \cmark                &                     &                      & Says the device may send backups to a server.                                        \\
-   \texttt{canCall}             &                          &                           &                       & \cmark              & \cmark               & Says the telephone numbers a device can call.                                        \\
-   \texttt{canConnectToAP}      &                          &                           & \cmark                &                     & \cmark               & Says a device may associate with an access point.                                    \\
-   \texttt{canConnectToNetwork} & \cmark                   &                           &                       &                     & \cmark               & Says the device may connect to a network, for example computers all within a subnet. \\
-   \texttt{canConnectToServer}  &                          &                           &                       & \cmark              & \cmark               & Says the subject (a device) can connect to a given server (identitfied by a URL).    \\
-   \texttt{canInstall}          &                          &                           &                       & \cmark              & \cmark               & Says the device may install an app.                                                  \\
-   \texttt{canMonitor}          & \cmark                   &                           &                       & \cmark              & \cmark               & Says the subject (a user) can monitor and unlock a device.                           \\
-   \texttt{canStore}            &                          &                           & \cmark                &                     & \cmark               & Says a device may store some data in permanent (non-transient) storage.              \\
-   \texttt{canUse}              &                          &                           &                       & \cmark              & \cmark               & Says a user may use a device.                                                        \\
-   \texttt{hasAcknowledged}     & \cmark                   & \cmark                    & \cmark                & \cmark              & \cmark               & Says an individual has acknoweldged a policy.                                        \\
-   \texttt{hasFeature}          &                          & \cmark                    &                       & \cmark              &                      & Says a device has a feature enabled.                                                 \\
-   \texttt{hasMet}              &                          & \cmark                    &                       & \cmark              & \cmark               & Says a something has met a given set of requirements.                                \\
-   \texttt{isActivated}         &                          &                           & \cmark                & \cmark              & \cmark               & Specifies a device has been activated for BYOD usage.                                \\
-   \texttt{isApp}               & \cmark                   &                           & \cmark                & \cmark              & \cmark               & Specifies an app.                                                                    \\
-   \texttt{isApproved}          &                          &                           & \cmark                &                     & \cmark               & Specifies that something has been vetted and approved of.                            \\
-   \texttt{isData}              & \cmark                   &                           &                       &                     & \cmark               & Specifies data.                                                                      \\
-   \texttt{isDevice}            & \cmark                   & \cmark                    & \cmark                & \cmark              & \cmark               & Specifies a device.                                                                  \\
-   \texttt{isEmployee}          & \cmark                   & \cmark                    &                       & \cmark              & \cmark               & Specifies that someone is an employee.                                               \\
-   \texttt{isEncrypted}         &                          & \cmark                    &                       & \cmark              & \cmark               & Specifies a device is encrypted.                                                     \\
-   \texttt{isFeature}           & \cmark                   &                           &                       &                     & \cmark               & Specifies a feature.                                                                 \\
-   \texttt{isInstallable}       &                          &                           &                       & \cmark              & \cmark               & Specifies an app is installable.                                                     \\
-   \texttt{isLost}              & \cmark                   &                           & \cmark                & \cmark              & \cmark               & Specifies a device is missing.                                                       \\
-   \texttt{isOwnedBy}           & \cmark                   & \cmark                    & \cmark                & \cmark              & \cmark               & Specifies something's owner.                                                         \\
-   \texttt{isSecurityLevel}     &                          &                           & \cmark                &                     & \cmark               & Specifies some data as having business sensitive information.                        \\
-   \texttt{isString}            & \cmark                   &                           &                       & \cmark              &                      & Specifies a string.                                                                  \\
-   \texttt{isTelephoneNumber}   &                          &                           &                       & \cmark              & \cmark               & Specifies a telephone number.                                                        \\
-   \texttt{mustDisable}         & \cmark                   & \cmark                    &                       & \cmark              & \cmark               & Forces the disablement of a feature (or a device).                                   \\
-   \texttt{mustInform}          & \cmark                   &                           & \cmark                & \cmark              & \cmark               & Forces someone to disclose something to someone.                                     \\
-   \texttt{mustWipe}            & \cmark                   &                           & \cmark                & \cmark              &                      & Forces a device to be erased.                                                        \\
-   \bottomrule
+    % \toprule 
+    Predicate                    & \angledtitle{Code3PSE} & \angledtitle{Edinburgh} & \angledtitle{HiMMS} & \angledtitle{NHS} & \angledtitle{SANS} & Description                                                                          \\
+    \midrule
+    \texttt{canBackupTo}         &                        & \cmark                  & \cmark              &                   &                    & Says the device may send backups to a server.                                        \\
+    \texttt{canCall}             &                        &                         &                     & \cmark            & \cmark             & Says the telephone numbers a device can call.                                        \\
+    \texttt{canConnectToAP}      &                        &                         & \cmark              &                   & \cmark             & Says a device may associate with an access point.                                    \\
+    \texttt{canConnectToNetwork} & \cmark                 &                         &                     &                   & \cmark             & Says the device may connect to a network, for example computers all within a subnet. \\
+    \texttt{canConnectToServer}  &                        &                         &                     & \cmark            & \cmark             & Says the subject (a device) can connect to a given server (identitfied by a URL).    \\
+    \texttt{canInstall}          &                        &                         &                     & \cmark            & \cmark             & Says the device may install an app.                                                  \\
+    \texttt{canMonitor}          & \cmark                 &                         &                     & \cmark            & \cmark             & Says the subject (a user) can monitor and unlock a device.                           \\
+    \texttt{canStore}            &                        &                         & \cmark              &                   & \cmark             & Says a device may store some data in permanent (non-transient) storage.              \\
+    \texttt{canUse}              &                        &                         &                     & \cmark            & \cmark             & Says a user may use a device.                                                        \\
+    \texttt{hasAcknowledged}     & \cmark                 & \cmark                  & \cmark              & \cmark            & \cmark             & Says an individual has acknoweldged a policy.                                        \\
+    \texttt{hasFeature}          &                        & \cmark                  &                     & \cmark            &                    & Says a device has a feature enabled.                                                 \\
+    \texttt{hasMet}              &                        & \cmark                  &                     & \cmark            & \cmark             & Says a something has met a given set of requirements.                                \\
+    \texttt{isActivated}         &                        &                         & \cmark              & \cmark            & \cmark             & Specifies a device has been activated for BYOD usage.                                \\
+    \texttt{isApp}               & \cmark                 &                         & \cmark              & \cmark            & \cmark             & Specifies an app.                                                                    \\
+    \texttt{isApproved}          &                        &                         & \cmark              &                   & \cmark             & Specifies that something has been vetted and approved of.                            \\
+    \texttt{isData}              & \cmark                 &                         &                     &                   & \cmark             & Specifies data.                                                                      \\
+    \texttt{isDevice}            & \cmark                 & \cmark                  & \cmark              & \cmark            & \cmark             & Specifies a device.                                                                  \\
+    \texttt{isEmployee}          & \cmark                 & \cmark                  &                     & \cmark            & \cmark             & Specifies that someone is an employee.                                               \\
+    \texttt{isEncrypted}         &                        & \cmark                  &                     & \cmark            & \cmark             & Specifies a device is encrypted.                                                     \\
+    \texttt{isFeature}           & \cmark                 &                         &                     &                   & \cmark             & Specifies a feature.                                                                 \\
+    \texttt{isInstallable}       &                        &                         &                     & \cmark            & \cmark             & Specifies an app is installable.                                                     \\
+    \texttt{isLost}              & \cmark                 &                         & \cmark              & \cmark            & \cmark             & Specifies a device is missing.                                                       \\
+    \texttt{isOwnedBy}           & \cmark                 & \cmark                  & \cmark              & \cmark            & \cmark             & Specifies something's owner.                                                         \\
+    \texttt{isSecurityLevel}     &                        &                         & \cmark              &                   & \cmark             & Specifies some data as having business sensitive information.                        \\
+    \texttt{isString}            & \cmark                 &                         &                     & \cmark            &                    & Specifies a string.                                                                  \\
+    \texttt{isTelephoneNumber}   &                        &                         &                     & \cmark            & \cmark             & Specifies a telephone number.                                                        \\
+    \texttt{mustDisable}         & \cmark                 & \cmark                  &                     & \cmark            & \cmark             & Forces the disablement of a feature (or a device).                                   \\
+    \texttt{mustInform}          & \cmark                 &                         & \cmark              & \cmark            & \cmark             & Forces someone to disclose something to someone.                                     \\
+    \texttt{mustWipe}            & \cmark                 &                         & \cmark              & \cmark            &                    & Forces a device to be erased.                                                        \\
+    \bottomrule
   \end{tabular}
   \caption{Summary of predicates used in multiple BYOD policies.}
   \label{tab:byod-predicates}
@@ -249,7 +251,83 @@ satisfy rules. These rules are then combined to form a policy. If a rule is
 reachable then there would be some combination of facts that could satisfy the
 rule. If there are no facts that could satisfy the rule then this suggests that
 the policy may be incomplete as there are policy rules that can never be
-satisfied.
+satisfied.  Formally for any goal $G$.
+\begin{align*}
+  \forall G.~G \in \text{Reachable}~\text{\textit{if}}~\exists A \in \text{AC}:~\forall G^\prime \in \text{conditionals}(A).~G^\prime \in \text{Reachable}.
+\end{align*}
+
+For example consider the following snippet taken from the NHS policy described
+in \autoref{sec:byod}.  The rule described in the policy is that an app must be
+approved by the \emph{integrated governance commitee} as well as by either the
+\emph{care and clinical policies group} as well as the \emph{management of
+  information group} depending on whether it is for clinical or business use. We
+can describe this in AppPAL as follows.
+\begin{lstlisting}
+'nhs-trust' says App isInstallable
+  if App isApproved, App isUsableClinically.
+'nhs-trust' says App isInstallable
+  if App isApproved, App isUsableNonClinically.
+'nhs-trust' says 'igc' can-say App:isApproved.
+'nhs-trust' says 'cacpg' can-say App:A isUsableClinically.
+'nhs-trust' says 'mig' can-say App:A isUsableNonClinically.
+\end{lstlisting}
+
+This is all very well, but what apps in practice are approved for use.
+As the policy document notes, none of the groups or committees have ever
+approved an app in practice.  If we run the reachability checker on this policy
+it reports that (amongst other information) that no app is installable.
+
+\begin{verbatim}
+$ java -jar Lint.jar --reachability example.policy
+[I]: loaded 1/1 files of 6 assertions
+Issues identified when checking reachability.
+The following decisions may be unreachable by their speakers:
+  'nhs-trust' says * isUsableClinically
+  'nhs-trust' says * isInstallable
+  'nhs-trust' says * isApproved
+  'nhs-trust' says * isUsableNonClinically
+
+In particular the following assertions are unreachable:
+  'nhs-trust' says App isInstallable if App isApproved, App isUsableNonClinically.
+  'nhs-trust' says App isInstallable if App isApproved, App isUsableClinically.
+
+These decisions may be reachable through delegation but we
+lack any statements to that effect from the delegated party:
+  (via 'cacpg') 'nhs-trust' says * isUsableClinically
+  (via 'igc') 'nhs-trust' says * isApproved
+  (via 'mig') 'nhs-trust' says * isUsableNonClinically
+\end{verbatim}
+
+As well as reporting which decisions it cannot make, it also reports the
+specific assertions as well as which decisions could be reached, but rely on
+delegation, and we have no information from the delegated speakers.  This could
+be because the delegated parties do not believe any app is approved, or it could
+be because we haven't asked them yet and imported their statements.
+
+This check is somewhat simple and we don't take into account dependencies
+between variables.  If we add, for example, the statements:
+
+\begin{lstlisting}
+'igc' says 'angry-birds' isApproved.
+'cacpg' says 'dropbox' isUsableClinically.
+'mig' says 'instagram' isUsableNonClinically.
+\end{lstlisting}
+
+Then we will still never find any installable apps, as the IGC, CACPG and MIG
+need to agree on the same app to find it installable.  When we run the
+reachability checker however, we find no problems as all the decisions are now
+reachable as there is a decision about \emph{some} variable; even if that
+variable isn't useful in practice.
+
+\begin{verbatim}
+$ java -jar Lint.jar --reachability example.policy
+[I]: loaded 1/1 files of 11 assertions
+[I]: no completeness problems
+\end{verbatim}
+
+The reachability checker acts as a quick sanity checker that a policy contains
+enough facts and rules to make any decision; unlike AppPAL proper which can
+check any specific decision.
 
 The code in \autoref{alg:reachable} produces a set of pairs of predicates and
 speakers where the a pair of a speaker and a predicate indicates that that
