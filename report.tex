@@ -1,5 +1,6 @@
 \documentclass[a4paper]{scrartcl} 
 \usepackage{bogwonch}
+\newcommand{\new}[1]{{\color{BrickRed}#1}}
 
 \title{Authorization Logic for Mobile Ecosystems}
 \subtitle{Third Year Report}
@@ -22,56 +23,57 @@
 \section{Progress}
 \label{sec:work}
 
-Last year I worked on implementing AppPAL on Android, implementing a security
+Last year, I worked on implementing AppPAL on Android, built a security
 knowledge base to store results from static analysis checkers and metadata about
-apps.  I surveyed (at a high level) some of the policies present in stores and
-their distribution mechanisms.  I also looked at whether users install apps
+apps. I surveyed some of the user and developer policies present in stores and
+their distribution mechanisms. I also investigated whether users install apps
 matching their privacy preferences and presented a draft of a paper, that was
 later accepted and published~\cite{hallett_apppal_2016}.
 
-This year I proposed working on a case-study looking at BYOD policies, and
-working on a knowledge distribution protocol to define how AppPAL assertions
+This year I proposed working on a case-study looking at BYOD policies and
+developing a knowledge distribution protocol to define how AppPAL assertions
 should be distributed.  Work on the BYOD policies has resulted in a presentation
 at iFM's doctoral symposium~\cite{hallett_specifying_2016}, but there hasn't
-been progress working on a knowledge distribution protocol.  Instead there has
-been work on developing analysis tools for AppPAL policies and some though on a
+been progress working on a knowledge distribution protocol.  Instead I have been
+worked on developing analysis tools for AppPAL policies and started creating a
 probabilistic variant of AppPAL.
 
 \subsection{Typed AppPAL}
 \label{sec:types}
 
 As part of SecPAL's safety condition all variables in an assertions head must be
-used in the body.  When trying to describe policies we found a common pattern is
-to give a person who satisfied some property (for example they were a staff
-member) the ability to say statements about apps.
+used in the body. When trying to describe policies a common pattern is to say a
+variable in an assertion belongs to a certain domain; for example someone who
+satisfied some property (for example they were a staff member) can make
+statements about apps.
 For example, Alice might be willing to let her friends say what apps are
 suitable for her children.  This could be expressed in SecPAL as follows:
+
 \begin{lstlisting}
-'alice' says Friend can-say
-  App isSuitableFor(Child)
-  if Friend isFriend,
-     App isApp,
-     Child isChild.
+'alice' says Friend can-say App isSuitableFor(Child)
+  if Friend isFriend, App isApp, Child isChild.
 \end{lstlisting}
+
 The conditionals in this assertion add unnecessary noise to the assertion. We
 know from the names of the variable what set of constants might be used to used
-to instantiate it (Alice's friends, apps or children). To avoid this noise I
-added a sugared syntax to AppPAL that allows variables to declare their
-\emph{type}.  Using the sugared notation the above statement becomes:
+to instantiate it (Alice's \emph{friends}, \emph{apps} or \emph{children}). To
+avoid this noise I added a sugared syntax to AppPAL that allows variables to
+declare their \emph{type}. Using the sugared notation the above statement
+becomes:
+
 \begin{lstlisting}
-'alice' says Friend:F can-say
-  App:A isSuitableFor(Child:C).
+'alice' says Friend:F can-say App:A isSuitableFor(Child:C).
 \end{lstlisting}
+
 \begin{figure}
   \newcommand{\nonterminal}[1]{$\langle$#1$\rangle$}
   \newcommand{\terminal}[1]{\textbf{#1}}
   \begin{tabular}{r c l}
     \footnotesize
     \nonterminal{E}         & $\coloneqq$ & \nonterminal{Variable} $\vert$ \terminal{'constant'} \\
-    \nonterminal{Variable}  & $\coloneqq$ & \terminal{Type}\terminal{:}\terminal{VariableName} \\
-                            & $\vert$     & \terminal{VariableName}
+    \nonterminal{Variable}  & $\coloneqq$ & \new{(\terminal{Type}\terminal{:})?}\terminal{VariableName}
   \end{tabular}
-  \caption{Changes to SecPAL's variable syntax.}
+  \caption{Changes to SecPAL's variable syntax.  Additions are shown in \new{red}.}
   \label{fig:apppal-types}
 \end{figure}
 The changes to SecPAL's syntax is shown is \autoref{fig:apppal-types}.
@@ -84,61 +86,64 @@ used start to have some intrinsic meaning.  If a predicate starts with
 \texttt{is} then it is describing some property of the predicates subject.
 SecPAL did not require predicates follow any naming conventions, however with
 AppPAL we have started to give predicates meaning based on their name.
-
+This is expanded in the \autoref{sec:byod} where we describe other predicate
+prefixes that we use for specific purposes.
 
 \subsection{BYOD Policies}
 \label{sec:byod}
 
-Employees bringing their own devices to work is increasingly common. Around 70\%
-of all companies having some form of \ac{BYOD} scheme~\cite{schulze_byod_2016}.
-In hospitals the use of personal devices as part of patient care is particularly
+Employees increasingly bring their own devices to work. Around 70\% of all
+companies having some form of \ac{BYOD} scheme~\cite{schulze_byod_2016}. In
+hospitals the use of personal devices as part of patient care is even more
 common. One survey from the UK found that around 80\% of surgical doctors were
 willing to use their personal devices for work, with 85\% regularly using them
 to look up information, and 50\% having medical apps already installed on their
-phones~\cite{patel_uk_2015}. Another from the US found similar numbers of
+phones~\cite{patel_uk_2015}. Another survey from the US found similar numbers of
 physicians regularly using their devices as part of their
 work~\cite{moyer_managing_2013}.
 
 Whilst there has been plenty of work looking at how to enforce BYOD policies,
 there has been something of a push-back against automatically enforcing them.
-\ac{MDM} software can enforce some policies by blacklisting apps, and rewriting
-apps to use guarded APIs; however having an \ac{MDM} package does not guarantee a
-company's BYOD policy is enforced correctly or even enforced.  One survey of
+Whilst \ac{MDM} software can enforce some policies by blacklisting or rewriting
+apps to use guarded APIs having an \ac{MDM} package does not guarantee a
+company's BYOD policy is enforced correctly or even enforced at all.  One survey of
 companies using \ac{MDM} software found that over half of them had devices that
 broke their policies within their
 networks~\cite{mobileiron_security_labs_q4_2015}.
 Whilst the majority of BYOD policies are relatively simple a report from the
 healthcare sector, where policies are typically more complex, noted that:
+
 \begin{quote}
   ``an approach toward educating the users instead of trying to control the
   technology may be more practical in the short term.''~\cite{moyer_managing_2013}
 \end{quote}
 
-The tension between \ac{MDM} software, which is relatively new, and having
-something that employees can understand has possibly led to many BYOD policies
-being published using natural language.  Whilst there has been much research on
-the \emph{technical} means to enforce them there has been little work comparing
-the natural languages of the policies in an effort to find the common idioms and
-requirements the companies want to enforce, as well as making precise
-comparisons between policies.
+The tension between \ac{MDM} software and having something that employees can
+understand has possibly led to many BYOD policies being published using natural
+language. Whilst there has been much research on the \emph{technical} means to
+enforce them there has been little work comparing the natural languages of the
+policies in an effort to find the common idioms and requirements the companies
+want to enforce, as well as making precise comparisons between policies.
 
-I have taken policies from five different sources.  One is from the SANS
+I have taken policies from five different sources as part of a case study into
+the rules and idioms used in BYOD policies.  One is from the SANS
 institute and serves as a guide for companies seeking to implement their own
 BYOD policy, one is from HiMMS and is a guide for hospitals looking to implement
-a BYOD policy.  Another is from an NHS trust and is a complex policy describing
+a BYOD policy.  Another from an NHS trust is a complex policy describing
 how medical staff should use their own devices when dealing with patients, as
 well as BYOD concerns.  The other two are simple BYOD polices typical of what
 most companies implement and are taken from Edinburgh University and a company
 selling emergency sirens.
 
-I have used AppPAL to create a formalisation of each of the policies.
-This has helped identify common predicates used in each of the policies
-(\autoref{tab:byod-predicates}).  It has also led to me adopting a set of
-standard prefixes for AppPAL predicates.  In \autoref{sec:types} I described how
+I have used AppPAL to create a formalisation of each of the policies. This has
+helped identify common predicates used in each of the policies
+(\autoref{tab:byod-predicates}). It has also led to me adopting a set of
+standard prefixes for AppPAL predicates. In \autoref{sec:types} I described how
 predicates that start with \emph{is} are reserved for predicates that give a
-type to their subject.  Through translating the BYOD policies I found four
+type to their subject. Through translating the BYOD policies I found four
 distinct categories of predicate that could encode all of the different rules in
-each of the policies.
+each of the policies as well as many different similarities in concerns for BYOD
+policies.
 
 
 \begin{table}\centering\footnotesize
@@ -204,7 +209,9 @@ semi-standard terms and AppPAL predicates.  I have also developed some
 rudimental tools for visualising the policies and what responsibilities each
 speaker has.  I plan to make comparisons between each of the policies and
 describe a standard set of predicates and tooling for reasoning about BYOD
-policies.  This would ideally lead to a publication, perhaps at
+policies.
+
+This  work should ideally lead to a publication, perhaps at
 iFM\footnote{Based on last year's CFP the submission date would be early January.} where
 earlier work on this was presented in their doctoral
 symposium~\cite{hallett_specifying_2016}.
@@ -214,24 +221,26 @@ subjects of the policy that they will follow, or be aware of, certain rules.
 These are interesting as they cannot be enforced by tooling (which
 looks at technical means to prevent devices from performing actions).  These
 acknowledgments may carry certain legal responsibilities; it would be
-interesting to look at how these can be collected and the delegations of trust
-within them.
+interesting to look at how these can be collected, what delegations of trust
+are made within them, and what responsibilities each speaker has.
 
 I had hoped to develop some analysis tools that might spot problems with the
 policies automatically (described~in~\autoref{sec:lint}) but the current state
 of BYOD policies is that most are too simple to have problems, and the faults in
 longer policies seem to be limited to rules being duplicated or underspecified
-rather than more interesting problems.  
+rather than more interesting problems,  such as having multiple ways of
+satisfying a rule which can undermine the security goals.
 
 \subsection{Automatic Analysis of Policies}
 \label{sec:lint}
 
 When examining an AppPAL policy it is natural to wonder whether the policy is as
-optimal as it could be.  Does an assertion context contain enough statements to
-use a given rule?  If there are multiple ways of deciding whether some statement
-is true or not does one rule require far less statements than any other?  Does
-one rule require only a subset of the facts of another rule, implying the second
-is redundant?
+optimal as it could be, or whether a decision is even reachable given the rules
+and facts contained in the policy. Does an assertion context contain enough
+statements to use a given rule? If there are multiple ways of deciding whether
+some statement is true or not does one rule require far less statements than any
+other? Does one rule require only a subset of the facts of another rule,
+implying the second is redundant?
 
 \subsubsection{Checking Reachability}
 
@@ -499,7 +508,6 @@ simply because we trust them more not to be evil. Again, without plausability it
 is difficult to represent these decisions.
 
 \subsubsection*{Modifying SecPAL for Plausability}
-\newcommand{\new}[1]{{\color{BrickRed}#1}}
 
 Retrofitting a probabilistic aspect to SecPAL requires changes to the inference
 rules and grammar. I have modified the inference rules in
@@ -657,7 +665,7 @@ $A$ says$_k^{p_\downarrow}$ $e$ $v$ :-
 \subsubsection*{Future Directions}
 
 I find the plausability work fascinating, but it is unlikely to progress much
-further.  Adding a confidence to an authorization logic, rather than a more
+3further.  Adding a confidence to an authorization logic, rather than a more
 general logic or agent system, seems like a sensible extension and for a limited
 set of use cases it seems to make sense for AppPAL to be able to reason with false
 positive rates of static analysis tools, and opinions; however I don't think
@@ -697,7 +705,8 @@ baby is born, and will probably be unproductive over Christmas.  That said,
 provided I get back into work, I don't think it will affect my submission.
 
 In terms of work remaining, most of the technical work is done.  Most things
-could do with a degree of polish, and 
+could do with a degree of polish, and... 
+
 \bibliographystyle{plain}
 \bibliography{report}
  
