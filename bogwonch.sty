@@ -3,11 +3,20 @@
 % Use a package if it hasn't already been loaded
 \newcommand{\includepackage}[2][]{\@ifpackageloaded{#2}{}{\usepackage[#1]{#2}}}
 
+% Colors
+\includepackage[usenames,dvipsnames]{xcolor}
+
 % Nicer typography
 \includepackage{microtype}
 
 % Saner lists
 \includepackage{enumerate}
+
+% Rotate stuff
+\includepackage{rotating}
+
+% Gantt charts
+\includepackage{pgfgantt}
 
 % Import files from a directory (useful for figures)
 \includepackage{import}
@@ -16,9 +25,6 @@
 \usepackage{acronym}
 \acrodef{MDM}{mobile device management}
 \acrodef{BYOD}{bring your own device}
-
-% Colors
-\includepackage[usenames,dvipsnames]{xcolor}
 
 % Source code listings
 \includepackage{listings}
@@ -70,3 +76,7 @@
 
 % Hyperlinks
 \includepackage{hyperref}
+
+% PDF including
+\includepackage{pdfpages}
+

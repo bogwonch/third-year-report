@@ -106,7 +106,7 @@ knowledge base to store results from static analysis checkers and metadata about
 apps. I surveyed user and developer policies present in stores and
 their distribution mechanisms. I also investigated whether users install apps
 matching their privacy preferences and presented a draft of a paper, that was
-later accepted and published~\cite{hallett_apppal_2016}.
+later accepted and published~\cite{hallett_apppal_2016} and is included in the appendix.
 
 This year I proposed working on a case-study looking at BYOD policies and
 developing a knowledge distribution protocol to define how AppPAL assertions
@@ -208,9 +208,11 @@ healthcare sector, where policies are typically more complex, noted that:
 The tension between \ac{MDM} software and having something that employees can
 understand has possibly led to many BYOD policies being published using natural
 language. Whilst there has been much research on the \emph{technical} means to
-enforce BYOD policies~\cite{martinelli_enhancing_2016,armando_enabling_2014,costantino_towards_2013} there has been little work comparing the natural languages of the
-policies in an effort to find the common idioms and requirements the companies
-want to enforce, as well as making precise comparisons between policies.
+enforce BYOD
+policies~\cite{martinelli_enhancing_2016,armando_enabling_2014,costantino_towards_2013}
+there has been little work comparing the natural languages of the policies in an
+effort to find the common idioms and requirements the companies want to enforce,
+as well as making precise comparisons between policies.
 
 I have taken policies from five different sources as part of a case study into
 the rules and idioms used in BYOD policies.  One is from the SANS
@@ -388,7 +390,7 @@ or business use. We can describe this in AppPAL as follows:
 This is all very well, but what apps in practice are approved for use.
 As the policy document notes, none of the groups or committees have ever
 approved an app in practice.  When we run the satisfiability checker on this policy
-it reports that (amongst other information) that no app is installable.
+it reports that (amongst other information) no app is installable.
 
 \begin{lstlisting}
 $\$$ java -jar Lint.jar --satisfiability example.policy
@@ -439,8 +441,8 @@ $\$$ java -jar Lint.jar --satisfiability example.policy
 \end{lstlisting}
 
 The satisfiability checker acts as a quick sanity checker that a policy contains
-enough facts and rules to make any decision; unlike AppPAL proper which can
-check any specific decision.
+enough facts and rules to use all of the rules in the policy; unlike AppPAL
+proper which can check any specific decision.
 
 %The code in \autoref{alg:reachable} produces a set of pairs of predicates and
 %speakers where the pair of a speaker and a predicate indicates that that
@@ -475,6 +477,15 @@ check any specific decision.
 
 \subsubsection{Checking Redundancy}
 
+In logic programming there are two types of redundancy~\cite{alon_levy_constraints_1992}:
+\begin{itemize}
+\item \emph{Unreachability} occurs if a predicate does not take part in the
+  minimal deverivation tree of a fact.
+\item \emph{Irrelevance} occurs if a derivation tree contains pairs of identical atoms.
+\end{itemize}
+
+% TODO: sort this crap out.  make sure I'm using the terms from logic programming/
+
 Redundancy occurs when there are multiple rules that result in the same decision being
 made.  Rules may depend on other rules, or ground facts.  One proof ($A$) is made
 redundant by another proof ($B$) if the set of ground facts used in $B$ is a
@@ -495,8 +506,8 @@ as it implies the two statements may not be independent.
 \end{align*}
 
 
-A simple example might be the policy shown in \autoref{fig:redundancy-graph-simple}
-Clearly the second rule makes the first redundant.  We can represent the policy
+A simple example might be the policy shown in \autoref{fig:redundancy-graph-simple}.
+The second rule makes the first redundant.  We can represent the policy
 as a graph shown opposite the policy.  The goal (shown as a blue rectangle) has two routes
 to prove it true (each shown in ellipses).  Route 1 requires that the facts
 (shown in green rectangles) \lstinline!'x' says 'y' r,! and
@@ -875,25 +886,25 @@ in less than a week, and a limited demonstration may be a nice addition to my th
 My thesis is due by the end of June 2017.
 
 A table of contents for the thesis is shown in \autoref{sec:thesis-outline}.
-Presently there are just under forty unedited pages written(including table of contents,
-bibliography, etc); mostly in chapters two and three. Since July, when I
-returned to fulltime study, I've been aiming to spend a day a week working on
-the thesis.  I expect this time to start increasing to two or three days a week
+Presently there are just under forty unedited pages written(including table of
+contents, bibliography, etc); mostly in chapters two and three. Since July, when
+I returned to fulltime study, I've been aiming to spend a day a week writing the
+thesis. I expect this time to start increasing to two or three days a week
 writing after the submission of this report, and for me to be working full-time
-on it from January.  I am planning on having a complete draft finished by April,
+on it from January. I am planning on having a complete draft finished by April,
 in time for submission in June.
 
-Distractions will be kept to a minimum in the time remaining.
-I am not taking on any teaching assistant work, in part because I
-no longer live in Edinburgh.  I have taken on a small amount of work helping
-with \emph{Academic Center of Excellence} application, which is taking about a
-day a week at the moment, but I do not expect it to continue beyond
-October/November.
-The biggest impediment I can currently predict is that me and my wife is expecting our
-first child towards the end of November.  I don't know how this is going to
-affect my work, but I'm intending to stop work for at least two weeks once the
-baby is born, and will probably be unproductive over Christmas.  That said,
-provided I get back into work, I don't think it will affect my submission.
+% Distractions will be kept to a minimum in the time remaining.
+% I am not taking on any teaching assistant work, in part because I
+% no longer live in Edinburgh.  I have taken on a small amount of work helping
+% with \emph{Academic Center of Excellence} application, which is taking about a
+% day a week at the moment, but I do not expect it to continue beyond
+% October/November.
+% The biggest impediment I can currently predict is that me and my wife is expecting our
+% first child towards the end of November.  I don't know how this is going to
+% affect my work, but I'm intending to stop work for at least two weeks once the
+% baby is born, and will probably be unproductive over Christmas.  That said,
+% provided I get back into work, I don't think it will affect my submission.
 
 Next steps include writing the bulk of the thesis, and polish.  The literature
 survey could also do with expansion.  Some introductory material has been
@@ -921,19 +932,18 @@ five will build on several unpublished notes from this year.
     \item Mobile Ecosystems
     \end{enumerate}
   \item App Stores
-    \begin{enumerate}[2.2.1]
-    \item Different marketplace
+    \begin{enumerate}[{2.2.}1]
+    \item Different marketplaces
     \item Distribution mechanisms
     \end{enumerate}
   \item Authorization logics and Fine Grained Permission Systems
-    \begin{enumerate}[2.3.1]
+    \begin{enumerate}[{2.3.}1]
     \item PolicyMaker and Keynote
     \item SPKI/SDSI
     \item RT
     \item SecPAL and DKAL
     \item Cassandra
     \item XACML
-   
     \item Dr. Android and Mr. Hide
     \item Aurasium
     \item CRePE
@@ -947,27 +957,47 @@ five will build on several unpublished notes from this year.
   \begin{enumerate}[3.1]
   \item Why SecPAL
   \item Instantiating SecPAL for mobile ecosystems
+    \begin{enumerate}[{3.2.}1]
+    \item Changes to SecPAL
+    \item Typed AppPAL
+    \item Predicate conventions
+    \end{enumerate}
   \item Examples of AppPAL
   \item Implementation
   \end{enumerate}
 \item Apps and App Stores
   \begin{enumerate}[4.1]
   \item Users and Apps
-    \begin{enumerate}[4.1.1]
+    \begin{enumerate}[{4.1.}1]
     \item What privacy preferences do users have?
     \item Encoding privacy preferences in AppPAL
     \end{enumerate}
   \item Finding Apps that fit privacy preferences
   \item Differences in App stores
+    \begin{enumerate}[{4.3.}1]
+    \item Developer terms and conditions
+    \item User terms and conditions
+    \end{enumerate}
   \item An AppPAL enhanced store
   \end{enumerate}
 \item Reasoning about policies
   \begin{enumerate}[5.1]
   \item Corporate policies in the workplace
-  \item Precisely comparing BYOD policies
+    \begin{enumerate}[{5.1.}1]
+    \item Overview of BYOD policies 
+      \begin{enumerate}[{5.1.1.}1]
+      \item NHS
+      \item HiMMS
+      \item SANS
+      \item Simpler policies (Edinburgh and Code3PSE)
+      \end{enumerate}
+    \item Review of MDM software
+    \item Precisely comparing BYOD policies
+    \item BYOD idioms in AppPAL
+    \end{enumerate}
   \item Inferring problems with AppPAL policies automatically
     \begin{enumerate}[5.1.3]
-    \item Reachability
+    \item Satisfiability
     \item Redundancy
     \item Contradiction
     \item Schemas
@@ -975,5 +1005,51 @@ five will build on several unpublished notes from this year.
   \end{enumerate}
 \item Conclusions
 \end{enumerate}
+\pagebreak
+
+\section{Schedule for Completion}
+\begin{center}
+%\begin{sideways}\centering
+  \begin{ganttchart}{1}{24}
+    \gantttitle{2017}{24}       \\
+    \gantttitle{January}{4}
+    \gantttitle{February}{4}
+    \gantttitle{March}{4}
+    \gantttitle{April}{4}
+    \gantttitle{May}{4}
+    \gantttitle{June}{4} \\
+    \gantttitlelist{1,...,24}{1} \\
+    \ganttbar{Write chapter 3}{1}{2} 
+    \ganttbar{}{4}{4} \\
+    \ganttbar{Write chapter 2}{5}{8} 
+    \ganttbar{}{11}{12} \ganttbar{}{14}{14} \\
+    \ganttbar{Write chapter 4}{9}{12}
+    \ganttbar{}{15}{16} \ganttbar{}{18}{18}\\
+    \ganttbar{Write chapter 5}{13}{16} 
+    \ganttbar{}{19}{20} \ganttbar{}{22}{22}\\
+    \ganttbar{Intro and conclusion}{17}{18}\\
+    \ganttbar{Final editing}{17}{24} 
+  \end{ganttchart}
+%\end{sideways}
+\end{center}
+
+Shown above is a Gantt chart for how I expect to spend my time from January
+writing the thesis.  I have split the writing into three stages: first draft,
+first edit second edit, each with a gap between to let me collect feedback.
+
+I have also kept January and February relatively quiet as I will have a newborn baby to
+look after, and I don't know how this will affect my work. Assuming it isn't
+doesn't slow me down too much then I can always press on with other writing and
+move the start dates back.  If it does slow my work down, however, then at least
+I have planned for it.
+
+I am aiming to have a near-complete first draft ready by the start of May, and
+the final completed thesis by the end of June (when my funding ends).
+
+\pagebreak
+\section{Doctoral Symposium Paper from iFM}
+\includepdf[pages=-]{ifm-ds.pdf}
+
+
 
 \end{document}
