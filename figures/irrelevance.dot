@@ -1,0 +1,29 @@
+digraph irrelevance {
+	//rankdir=LR;
+	CUcansayUhasLostD [shape=box label="'company' says U can-say U hasLost(D)."];
+	CUisUser          [shape=box label="'company' says U isUser."];
+	CDisDevice        [shape=box label="'company' says D isDevice."];
+	CDisOwnedByU      [shape=box label="'company' says D isOwnedBy(U)."];
+	UUhasLostD        [shape=box label="U says U hasLost(D)."];
+	CUhasLostD        [shape=box label="'company' says U hasLost(D)."];
+	CUmustInform      [shape=box label="'company' says U mustInform('help-desk', 'device-lost')."];
+	
+	p_CUhasLostD [shape=plaintext label="[1]"];
+	p_CUcansayUhasLostD [shape=plaintext label="[1]"];
+	p_CUmustInform [shape=plaintext label="[1]"];
+
+	
+	CUhasLostD -> p_CUhasLostD;
+	p_CUhasLostD -> UUhasLostD;
+	p_CUhasLostD -> CUcansayUhasLostD;
+	
+	CUcansayUhasLostD -> p_CUcansayUhasLostD;
+	p_CUcansayUhasLostD -> CUisUser [color=red style=dashed];
+	p_CUcansayUhasLostD -> CUisUser [color=red];
+	p_CUcansayUhasLostD -> CDisDevice;
+	p_CUcansayUhasLostD -> CDisOwnedByU;
+
+	CUmustInform -> p_CUmustInform;
+	p_CUmustInform -> CUisUser [color=red style=dashed];
+	p_CUmustInform -> CUhasLostD;
+}

@@ -64,21 +64,27 @@ policies.
 The work will focus on the ecosystems surround Google's Android operating system, the
 largest mobile OS.  Unlike iOS (the OS for Apple's devices), there is a greater
 variation in the app stores available (Play Store, Amazon App Store, Yandex,
-Baidu and Qihoo 360 to name but a few) as well as a broader amount of research
-on Android's apps and permission systems.
-% TODO: citations please
+Baidu and 360 Mobile Assistant to name but a few) as well as a broader amount of research
+on Android's apps and permission systems~\cite{felt_android_2012,chaudhuri_language-based_2009,lin_modeling_2014}.
 
+Much prior work has focused on the technical side of policies; extending Android
+with more sophisticated permission systems and complex enforcement
+schemes~\cite{jeon_dr._2012,armando_android_2015,hornyack_these_2011}. This work
+differs in that it focuses on the human policies, and is happy to delegate the
+precise enforcement mechanism to a tool.
 
-Much prior work has focused on the
-technical side of policies; extending Android with more sophisticated permission
-systems and complex enforcement schemes.  This work differs in that it focuses
-on the human policies, and is happy to delegate the precise enforcement
-mechanism to a tool.
-
-To do this I have taken an existing authorization language, SecPAL, and applied
+To do this I have taken an existing authorization language, SecPAL~\cite{becker_secpal:_2010}, and applied
 it to the problem of formalising the user level policies in mobile ecosystems
-(and in doing created a modified implementation of SecPAL called \emph{AppPAL})
+(and in doing created a modified implementation of SecPAL called \emph{AppPAL}~\cite{hallett_apppal_2016})
 Specifically I aim to show:
+
+\begin{quote}
+  \textbf{Thesis:}\itshape
+  Formal languages can model the natural language policies in the Android
+  ecosystem, and in doing so help users, businesses, and developers make
+  decisions on the basis of a declarative policy, rather than an informal
+  understanding of their preferences, rules, and policies.
+\end{quote}
 
 \begin{itemize}
 \item That authorization languages with named speakers (specifically AppPAL) are
@@ -93,10 +99,6 @@ Specifically I aim to show:
   agreements in stores or app preferences), and identify problems
   with them ahead of time.
 \end{itemize}
-
-
-% TODO: What is the ``thesis of the thesis''? (a stupid DA term).
-% It is basically the goals but refutable.
 
 \section{Progress}
 \label{sec:work}
@@ -498,27 +500,74 @@ In logic programming there are two types of redundancy~\cite{alon_levy_constrain
 \item \emph{Irrelevance} occurs if a derivation tree contains pairs of identical atoms.
 \end{itemize}
 
-% TODO: sort this crap out.  make sure I'm using the terms from logic programming/
+These ideas are directly relatable to AppPAL, for instance if we have the
+following AppPAL policy:
 
-Redundancy occurs when there are multiple rules that result in the same decision being
-made.  Rules may depend on other rules, or ground facts.  One proof ($A$) is made
-redundant by another proof ($B$) if the set of ground facts used in $B$ is a
-subset of the ground facts used in $A$. Whenever $A$ is satisfied $B$ will also
-be, but when $B$ is satisfied $A$ may not be: consequently $A$ is redundant as
-$B$ can be used to prove its goal with fewer facts.
-Formally for any goal $G$.
-\begin{align*}
-  \exists p_1 \in \text{proofs}(G).~\exists p_2 \in \text{proofs}(G).        & \\
-  p_1 \not= p_2~\wedge~\text{facts}(p_1) \subset \text{facts}(p_2)           & \implies G\text{ has redundant proofs.} \\
-  p_1 \not= p_2~\wedge~\text{facts}(p_1) = \text{facts}(p_2)                 & \implies G\text{ has equivalent proofs.}
-\end{align*}
-Additionally if two different goals ($G$ and $G^\prime$) have equivalent proofs, then we report this
-as it implies the two statements may not be independent.
-\begin{align*}
-  \exists p_1 \in \text{proofs}(G).~\exists p_2 \in \text{proofs}(G^\prime). & \\
-  \text{facts}(p_1) = \text{facts}(p_2)                                      & \implies \text{$G$ and $G^\prime$ have equivalent proofs.}
-\end{align*}
+\begin{lstlisting}
+'alice' says App isInstallable
+  if App isRecommended,
+     App isNotMalware.
 
+'alice' says App isRecommended
+  if App isNotMalware,
+     App isGood.
+\end{lstlisting}
+
+Alice checks that the app is not malware when checking the app is
+installable and when checking that the app is recommended.  The check in
+\texttt{isInstallable} is irrelevant.  When writing AppPAL policies this kind of
+irrelevance commonly occurs when using the typed-syntax described in
+\autoref{sec:types}. For example, in this excerpt from a SANS BYOD policy there
+is a check that \emph{U} is a user in both assertions.  In the first there is
+irrelevance because \emph{U} is stated as being a user twice, where once would
+have been sufficient.  In the second there is a single check that \emph{U} is a
+user but it is irrelevant as the check had already been done when checking is
+\emph{U} had lost the device (since only users can lose devices in the first assertion).
+
+\begin{lstlisting}
+'company' says User:U can-say User:U hasLost(Device:D)
+  if D isOwnedBy(U).
+
+'company' says User:U mustInform('help-desk', 'device-lost')
+  if U hasLost(Device).
+\end{lstlisting}
+
+We can check for this kind of irrelevance by building a proof-graph for the
+assertion context.  Every node (shown in a box) represents an AppPAL fact we
+might wish to prove.  For every assertion in the context we create a proof
+(represented as a number in brackets) for the head of the assertion, which is
+connected to the facts required to prove the assertion.  In the case of can-say
+and can-act-as statements we expand them as per AppPAL's inference rules.
+A proof-graph for the above example is shown in \autoref{fig:irrelevance}: the
+irrelevant links are shown in red and the AppPAL facts connected to the two
+dashed ones can be removed to remove the irrelevance.
+
+\begin{figure}
+  \centering
+  \includegraphics[width=0.5\linewidth]{./figures/irrelevance.png}
+  \caption{Proof graph showing irrelevance}
+  \label{fig:irrelevance}
+\end{figure}
+
+
+% Redundancy occurs when there are multiple rules that result in the same decision being
+% made.  Rules may depend on other rules, or ground facts.  One proof ($A$) is made
+% redundant by another proof ($B$) if the set of ground facts used in $B$ is a
+% subset of the ground facts used in $A$. Whenever $A$ is satisfied $B$ will also
+% be, but when $B$ is satisfied $A$ may not be: consequently $A$ is redundant as
+% $B$ can be used to prove its goal with fewer facts.
+% Formally for any goal $G$.
+% \begin{align*}
+%   \exists p_1 \in \text{proofs}(G).~\exists p_2 \in \text{proofs}(G).        & \\
+%   p_1 \not= p_2~\wedge~\text{facts}(p_1) \subset \text{facts}(p_2)           & \implies G\text{ has redundant proofs.} \\
+%   p_1 \not= p_2~\wedge~\text{facts}(p_1) = \text{facts}(p_2)                 & \implies G\text{ has equivalent proofs.}
+% \end{align*}
+% Additionally if two different goals ($G$ and $G^\prime$) have equivalent proofs, then we report this
+% as it implies the two statements may not be independent.
+% \begin{align*}
+%   \exists p_1 \in \text{proofs}(G).~\exists p_2 \in \text{proofs}(G^\prime). & \\
+%   \text{facts}(p_1) = \text{facts}(p_2)                                      & \implies \text{$G$ and $G^\prime$ have equivalent proofs.}
+% \end{align*}
 
 A simple example might be the policy shown in \autoref{fig:redundancy-graph-simple}.
 The second rule makes the first redundant.  We can represent the policy
@@ -581,58 +630,58 @@ equivalent policies).
   \label{fig:redundancy-complex}
 \end{figure}
 
-To build the graphs, each statement we might want to prove (a goal) becomes a
-node in the graph, its children are organised into sets of goals (a proof),
-where if all the goals in any set were proved true then the goal node would also
-become true. If a node has an empty set of goals to prove it is a fact. Once the
-graph has been constructed (taking into account delegation and unification with
-other statements), the graph is flattened by applying the flatten procedure
-(Listing~\ref{alg:flatten}) repeatedly until a fixed point is reached. When the
-graph has been flattened we look for redundancy by looking for goals with proofs
-that are subsets of their other proofs, implying that if the larger proof is
-true, then the shorter proof will always be true too; and different goals with
-identical proofs, implying that the two decisions are not
-independent~(Listing~\ref{alg:redundancy}).
+% To build the graphs, each statement we might want to prove (a goal) becomes a
+% node in the graph, its children are organised into sets of goals (a proof),
+% where if all the goals in any set were proved true then the goal node would also
+% become true. If a node has an empty set of goals to prove it is a fact. Once the
+% graph has been constructed (taking into account delegation and unification with
+% other statements), the graph is flattened by applying the flatten procedure
+% (Listing~\ref{alg:flatten}) repeatedly until a fixed point is reached. When the
+% graph has been flattened we look for redundancy by looking for goals with proofs
+% that are subsets of their other proofs, implying that if the larger proof is
+% true, then the shorter proof will always be true too; and different goals with
+% identical proofs, implying that the two decisions are not
+% independent~(Listing~\ref{alg:redundancy}).
 
-\begin{lstlisting}[language=Python,float,caption={Procedure for flattening the redundancy graph.},label={alg:flatten}]
-def flatten(graph):
-  for goal in graph.goals:
-    hoist = true
-    for proof in graph[goal]:
-      for proof_goal in proof:
-        if not proof_goal.is_fact:
-          hoist = False
-          break
-      if hoist == True:
-        hoist(graph, goal)
+% \begin{lstlisting}[language=Python,float,caption={Procedure for flattening the redundancy graph.},label={alg:flatten}]
+% def flatten(graph):
+%   for goal in graph.goals:
+%     hoist = true
+%     for proof in graph[goal]:
+%       for proof_goal in proof:
+%         if not proof_goal.is_fact:
+%           hoist = False
+%           break
+%       if hoist == True:
+%         hoist(graph, goal)
 
-def hoist(graph, target):
-  for parent in graph[target].parents:
-    for proof in parent.proofs:
-      if proof.uses(target):
-        for replacements in graph[target].parents:
-          parent.proofs += proof.replace(target, replacements)
-          parent.proofs -= proof
-\end{lstlisting}
+% def hoist(graph, target):
+%   for parent in graph[target].parents:
+%     for proof in parent.proofs:
+%       if proof.uses(target):
+%         for replacements in graph[target].parents:
+%           parent.proofs += proof.replace(target, replacements)
+%           parent.proofs -= proof
+% \end{lstlisting}
 
-\begin{lstlisting}[language=Python,float,caption={Procedure to check for redundancy.},label={alg:redundancy}]
-def check_redundancy(graph) -> boolean:
-  for goal in graph.goals:
-    for a in graph[goal]:
-      for b in graph[goal]:
-        if a >= b and a.goals.subset(b.goals):
-          if b.goals.subset(a.goals):
-            warn(a+" has multiple equivalent proofs")
-          else
-            warn(a+" has a redundant proof")
-    for other_goal in graph.goals:
-      if goal > other_goal:
-        for a in graph[goal]:
-          for b in graph[other_goal]:
-            if not (a.goals.is_empty() or b.is_empty())
-               and a.goals == b.goals:
-              warn(a+" and "+b+" have equivalent proofs")
-\end{lstlisting}
+% \begin{lstlisting}[language=Python,float,caption={Procedure to check for redundancy.},label={alg:redundancy}]
+% def check_redundancy(graph) -> boolean:
+%   for goal in graph.goals:
+%     for a in graph[goal]:
+%       for b in graph[goal]:
+%         if a >= b and a.goals.subset(b.goals):
+%           if b.goals.subset(a.goals):
+%             warn(a+" has multiple equivalent proofs")
+%           else
+%             warn(a+" has a redundant proof")
+%     for other_goal in graph.goals:
+%       if goal > other_goal:
+%         for a in graph[goal]:
+%           for b in graph[other_goal]:
+%             if not (a.goals.is_empty() or b.is_empty())
+%                and a.goals == b.goals:
+%               warn(a+" and "+b+" have equivalent proofs")
+% \end{lstlisting}
 
 \subsubsection*{Future Directions}
 
@@ -723,183 +772,199 @@ Google may be able to get away with a lot more permissions than other developers
 simply because we trust them more not to be evil. Again, without plausability it
 is difficult to represent these decisions.
 
-\subsubsection*{Modifying SecPAL for Plausability}
+Probabilistic versions of Datalog are not a new idea.  Various papers proposed
+probabilistic variants of Datalog~\cite{fuhr_probabilistic_1995} or explored the
+semantics of probabilistic logics~\cite{halpern_analysis_1990}.  Role-based
+access control languages have incorporated ideas about risk into their
+schemes~\cite{josang_analysing_2004,dimmock_using_2004,salim_approach_2011},
+which is a similar notion to plausability and trust.  These schemes do not seem
+to deal with delegation in the same manner as SecPAL however so incorporating
+similar ideas here may be interesting and allow SecPAL and AppPAL greater
+expressiveness.  Part of the work toward this this year has included modifying Becker's
+evaluation and translation-to-Datalog algorithms~\cite{becker_secpal:_2010} to
+include a plausability value, and for giving rules to query on the basis of
+them, using Datalog$^C$~\cite{li_datalog_2003}.
 
-Retrofitting a probabilistic aspect to SecPAL requires changes to the inference
-rules and grammar. I have modified the inference rules in
-\autoref{fig:plausible-rules} so that the \emph{says} statement carries an
-additional annotation denoting the plausability of the statement, which can be
-combined with other implausibilities using an unspecified addition operator
-($\oplus$).
+% \subsubsection*{Modifying SecPAL for Plausability}
 
-\begin{figure}\centering\footnotesize
-  \newcommand{\AC}[0]{\ensuremath\text{AC}}
-  \newcommand{\secpalmath}[1]{\ensuremath\texttt{#1}}
-  \newcommand{\says}[1]{\secpalmath{says}^{\new{#1}}}
-  \newcommand{\canSay}[1]{\secpalmath{can-say}_{#1}}
-  \newcommand{\canActAs}[0]{\secpalmath{can-act-as}}
-  \newcommand{\spif}[0]{\secpalmath{if}}
-  \newcommand{\where}[0]{\secpalmath{where}}
-  \begin{eqnarray*}
-    \infer[\text{cond\new{$\leq$}}]{
-    \AC, D \models A~\says{\bigoplus_{i=1}^n p_i}~f\theta
-    }{
-    \begin{matrix}{
-        \left(A~\says{\text{at least}~p_{lim}}~f~if~f_1\cdots f_n~\where~c\right) \in \AC
-      }\\{
-        \forall i \in [1\cdots n]. \AC, D \models A~\says{p_i}~f_i\theta
-      }\\\new{
-        0 < p_{lim} \leq \bigoplus_{i=1}^n p_i
-      }
-    \end{matrix}&
-                  \vdash c\theta &
-                                   vars\left(f\theta\right) = \emptyset
-                                   }
-    \\
-    \infer[\text{cond\new{=}}]{
-    \AC, D \models A~\says{p_{lim}}~f\theta
-    }{
-    \begin{matrix}{
-        \left(A~\says{\text{is}~p_{lim}}~f~if~f_1\cdots f_n~\where~c\right) \in \AC
-      }\\{
-        \forall i \in [1\cdots n]. \AC, D \models A~\says{p_i}~f_i\theta
-      }\\\new{
-        0 < p_{lim} \leq \bigoplus_{i=1}^n p_i
-      }
-    \end{matrix}&
-                  \vdash c\theta &
-                                   vars\left(f\theta\right) = \emptyset
-                                   }
-    \\
-    \infer[\text{can-say}]{
-    \AC, \infty \models A~\says{p_1 \oplus p_2}~f
-    }{
-    \AC, \infty \models A~\says{p_1}~B~\canSay{D}~f &
-                                                      \AC, D \models B~\says{p_2}~f
-                                                      }
-    \\
-    \infer[\text{can-act-as}]{
-    \AC, D \models A~\says{p_1 \oplus p_2}~x~vp
-    }{
-    \AC, D \models A~\says{p_1}~x~\canActAs~y &
-                                                \AC, D \models B~\says{p_2}~y~vp
-                                                }
-    \\
-    \new{
-    \infer[\text{reduce}]{
-    \AC, D \models A~\says{p}~f
-    }{
-    \AC, D \models A~\says{p^\prime}~f & p \leq p^\prime
-                                         }
-                                         }
-  \end{eqnarray*}
-  \caption{Modified SecPAL grammar rules to support plausibility.  Modifications
-    are shown in red.}
-  \label{fig:plausible-rules}
-\end{figure}
+% Retrofitting a probabilistic aspect to SecPAL requires changes to the inference
+% rules and grammar. I have modified the inference rules in
+% \autoref{fig:plausible-rules} so that the \emph{says} statement carries an
+% additional annotation denoting the plausability of the statement, which can be
+% combined with other implausibilities using an unspecified addition operator
+% ($\oplus$).
 
-Algorithm~5.2 from Becker's work~\cite{becker_secpal:_2010}, which translates
-between SecPAL and Datalog$^C$, can also be modified to support the
-plausabilities (and changes are again shown in red).  Since we still reduce to
-Datalog$^C$ with only some additional constraint checks the decidability
-properties SecPAL gets from Datalog should still be intact.
+% \begin{figure}\centering\footnotesize
+%   \newcommand{\AC}[0]{\ensuremath\text{AC}}
+%   \newcommand{\secpalmath}[1]{\ensuremath\texttt{#1}}
+%   \newcommand{\says}[1]{\secpalmath{says}^{\new{#1}}}
+%   \newcommand{\canSay}[1]{\secpalmath{can-say}_{#1}}
+%   \newcommand{\canActAs}[0]{\secpalmath{can-act-as}}
+%   \newcommand{\spif}[0]{\secpalmath{if}}
+%   \newcommand{\where}[0]{\secpalmath{where}}
+%   \begin{eqnarray*}
+%     \infer[\text{cond\new{$\leq$}}]{
+%     \AC, D \models A~\says{\bigoplus_{i=1}^n p_i}~f\theta
+%     }{
+%     \begin{matrix}{
+%         \left(A~\says{\text{at least}~p_{lim}}~f~if~f_1\cdots f_n~\where~c\right) \in \AC
+%       }\\{
+%         \forall i \in [1\cdots n]. \AC, D \models A~\says{p_i}~f_i\theta
+%       }\\\new{
+%         0 < p_{lim} \leq \bigoplus_{i=1}^n p_i
+%       }
+%     \end{matrix}&
+%                   \vdash c\theta &
+%                                    vars\left(f\theta\right) = \emptyset
+%                                    }
+%     \\
+%     \infer[\text{cond\new{=}}]{
+%     \AC, D \models A~\says{p_{lim}}~f\theta
+%     }{
+%     \begin{matrix}{
+%         \left(A~\says{\text{is}~p_{lim}}~f~if~f_1\cdots f_n~\where~c\right) \in \AC
+%       }\\{
+%         \forall i \in [1\cdots n]. \AC, D \models A~\says{p_i}~f_i\theta
+%       }\\\new{
+%         0 < p_{lim} \leq \bigoplus_{i=1}^n p_i
+%       }
+%     \end{matrix}&
+%                   \vdash c\theta &
+%                                    vars\left(f\theta\right) = \emptyset
+%                                    }
+%     \\
+%     \infer[\text{can-say}]{
+%     \AC, \infty \models A~\says{p_1 \oplus p_2}~f
+%     }{
+%     \AC, \infty \models A~\says{p_1}~B~\canSay{D}~f &
+%                                                       \AC, D \models B~\says{p_2}~f
+%                                                       }
+%     \\
+%     \infer[\text{can-act-as}]{
+%     \AC, D \models A~\says{p_1 \oplus p_2}~x~vp
+%     }{
+%     \AC, D \models A~\says{p_1}~x~\canActAs~y &
+%                                                 \AC, D \models B~\says{p_2}~y~vp
+%                                                 }
+%     \\
+%     \new{
+%     \infer[\text{reduce}]{
+%     \AC, D \models A~\says{p}~f
+%     }{
+%     \AC, D \models A~\says{p^\prime}~f & p \leq p^\prime
+%                                          }
+%                                          }
+%   \end{eqnarray*}
+%   \caption{Modified SecPAL grammar rules to support plausibility.  Modifications
+%     are shown in red.}
+%   \label{fig:plausible-rules}
+% \end{figure}
 
-Given an assertion:
-\begin{center} \lstinline!$A$ says$^{\new{p}}$ $f_0$ if $f_1\cdots f_n$ where $c$.! \end{center}
+% Algorithm~5.2 from Becker's work~\cite{becker_secpal:_2010}, which translates
+% between SecPAL and Datalog$^C$, can also be modified to support the
+% plausabilities (and changes are again shown in red).  Since we still reduce to
+% Datalog$^C$ with only some additional constraint checks the decidability
+% properties SecPAL gets from Datalog should still be intact.
 
-\begin{enumerate}
-\item
-  If $f_0$ is flat (it isn't a can-say statement), then the assertion is translated into the clause:
-  \begin{lstlisting}[language=Prolog]
-$A$ says$_k^{\new{p_*}}$ $f_0$ :-
-$A$ says$_k^{\new{p_1}}$ $f_1$ $\cdots$ $A$ says$_k^{\new{p_n}}$ $f_n$, c,
-$\new{p_\Sigma \text{ is } p_1 \oplus \cdots \oplus p_n}$,
-$\new{0 < p_{lim} \leq p_\Sigma}$.
-  \end{lstlisting}
-  Where $k$ is a fresh variable \new{and $p_*$ is $p_{lim}$ if the plausability is \texttt{is}, and $p_\Sigma$ is it is \texttt{at least}}.
+% Given an assertion:
+% \begin{center} \lstinline!$A$ says$^{\new{p}}$ $f_0$ if $f_1\cdots f_n$ where $c$.! \end{center}
 
-\item
-  Otherwise $f_0$ is of the form \lstinline!$e_0$ can-say $D_0$ $\cdots$ $e_{n-1}$ can-say $D_{n-1}$ $f$! where $f$ is flat.
-  Let $f^\prime_n \equiv f$ and \lstinline!$f^\prime_i \equiv e_i$ can-say $D_i$ $f^\prime_{i+1}$!, for $i\in\left\{0\cdots n-1\right\}$.
-  Note that $f_0 = f^\prime_0$.
+% \begin{enumerate}
+% \item
+%   If $f_0$ is flat (it isn't a can-say statement), then the assertion is translated into the clause:
+%   \begin{lstlisting}[language=Prolog]
+% $A$ says$_k^{\new{p_*}}$ $f_0$ :-
+% $A$ says$_k^{\new{p_1}}$ $f_1$ $\cdots$ $A$ says$_k^{\new{p_n}}$ $f_n$, c,
+% $\new{p_\Sigma \text{ is } p_1 \oplus \cdots \oplus p_n}$,
+% $\new{0 < p_{lim} \leq p_\Sigma}$.
+%   \end{lstlisting}
+%   Where $k$ is a fresh variable \new{and $p_*$ is $p_{lim}$ if the plausability is \texttt{is}, and $p_\Sigma$ is it is \texttt{at least}}.
 
-  Then the assertion \lstinline!$A$ says $f_0$ if $f_1\cdots f_m$, c, with plausability $p$! is translated into a set of $n+1$ Datalog rules as follows.
+% \item
+%   Otherwise $f_0$ is of the form \lstinline!$e_0$ can-say $D_0$ $\cdots$ $e_{n-1}$ can-say $D_{n-1}$ $f$! where $f$ is flat.
+%   Let $f^\prime_n \equiv f$ and \lstinline!$f^\prime_i \equiv e_i$ can-say $D_i$ $f^\prime_{i+1}$!, for $i\in\left\{0\cdots n-1\right\}$.
+%   Note that $f_0 = f^\prime_0$.
 
-  \begin{enumerate}
-  \item
-    We add the Datalog rule:
-    \begin{lstlisting}[language=Prolog]
-$A$ says$_k^{\new{p_*}}$ $f^\prime_0$ :-
-$x$ says$_k^{\new{p_1}}$ $f_1\cdots$ $A$ says$_k^{\new{p_m}}$ $f_m$, c,
-$\new{p_\Sigma \text{ is } p_1 \oplus \cdots \oplus p_n}$,
-$\new{0 < p_{lim} \leq p_\Sigma}$.
-    \end{lstlisting}
-    Where $k$ is a fresh variable, \new{and $p_*$ is $p_{lim}$ if the plausability is \texttt{is}, and $p_\Sigma$ is it is \texttt{at least}}.
+%   Then the assertion \lstinline!$A$ says $f_0$ if $f_1\cdots f_m$, c, with plausability $p$! is translated into a set of $n+1$ Datalog rules as follows.
 
-  \item
-    For each $i\in\left\{1\cdots n\right\}$, we add a Datalog rule
-    \begin{lstlisting}[language=Prolog]
-$A$ says$_\infty^{\new{p_*}}$ $f^\prime_i$ :-
-$x$ says$_{D_{i-1}}^{\new{p_1}}$ $f^\prime_i$,
-$A$ says$_{\infty}^{\new{p_2}}$ $x$ can-say $D_{i-1}$ $f^\prime_i$,
-$\new{p_* \text{ is } p_1\oplus p_2}$,
-$\new{0 < p_* \leq 1}$.
-    \end{lstlisting}
-    Where $x$ is a fresh variable.
-  \end{enumerate}
+%   \begin{enumerate}
+%   \item
+%     We add the Datalog rule:
+%     \begin{lstlisting}[language=Prolog]
+% $A$ says$_k^{\new{p_*}}$ $f^\prime_0$ :-
+% $x$ says$_k^{\new{p_1}}$ $f_1\cdots$ $A$ says$_k^{\new{p_m}}$ $f_m$, c,
+% $\new{p_\Sigma \text{ is } p_1 \oplus \cdots \oplus p_n}$,
+% $\new{0 < p_{lim} \leq p_\Sigma}$.
+%     \end{lstlisting}
+%     Where $k$ is a fresh variable, \new{and $p_*$ is $p_{lim}$ if the plausability is \texttt{is}, and $p_\Sigma$ is it is \texttt{at least}}.
 
-\item
-  For each Datalog rule created above of the form:
-  \begin{lstlisting}[language=Prolog]
-$A$ says$_k^p$ $e$ $v$ :- $\cdots$
-  \end{lstlisting}
-  we add a rule:
+%   \item
+%     For each $i\in\left\{1\cdots n\right\}$, we add a Datalog rule
+%     \begin{lstlisting}[language=Prolog]
+% $A$ says$_\infty^{\new{p_*}}$ $f^\prime_i$ :-
+% $x$ says$_{D_{i-1}}^{\new{p_1}}$ $f^\prime_i$,
+% $A$ says$_{\infty}^{\new{p_2}}$ $x$ can-say $D_{i-1}$ $f^\prime_i$,
+% $\new{p_* \text{ is } p_1\oplus p_2}$,
+% $\new{0 < p_* \leq 1}$.
+%     \end{lstlisting}
+%     Where $x$ is a fresh variable.
+%   \end{enumerate}
 
-  \begin{lstlisting}[language=Prolog]
-$A$ says$_\infty^{\new{p_*}}$ $e$ $v$ :-
-$x$ says$_{k}^{\new{p_1}}$ $x$ can-act-as $e$,
-$A$ says$_{k}^{\new{p_2}}$ $e$ $v$,
-$\new{p_* \text{ is } p_1\oplus p_2}$,
-$\new{0 < p_* \leq 1}$.
-  \end{lstlisting}
-  Where $x$ is a fresh variable.  Note that $k$ is not a fresh variable, but either a constant or a variable taken from the original rule.
+% \item
+%   For each Datalog rule created above of the form:
+%   \begin{lstlisting}[language=Prolog]
+% $A$ says$_k^p$ $e$ $v$ :- $\cdots$
+%   \end{lstlisting}
+%   we add a rule:
+
+%   \begin{lstlisting}[language=Prolog]
+% $A$ says$_\infty^{\new{p_*}}$ $e$ $v$ :-
+% $x$ says$_{k}^{\new{p_1}}$ $x$ can-act-as $e$,
+% $A$ says$_{k}^{\new{p_2}}$ $e$ $v$,
+% $\new{p_* \text{ is } p_1\oplus p_2}$,
+% $\new{0 < p_* \leq 1}$.
+%   \end{lstlisting}
+%   Where $x$ is a fresh variable.  Note that $k$ is not a fresh variable, but either a constant or a variable taken from the original rule.
 
 
-  \new{
-    We also add a rule (to account for the reduce rule)
-    that should not be used in general, but only when trying to reduce the
-    plausability to account for a lower bound on plausability in a query:
-  }
+%   \new{
+%     We also add a rule (to account for the reduce rule)
+%     that should not be used in general, but only when trying to reduce the
+%     plausability to account for a lower bound on plausability in a query:
+%   }
 
-  \begin{lstlisting}[basicstyle=\color{BrickRed}\ttfamily]
-$A$ says$_k^{p_\downarrow}$ $e$ $v$ :-
-$A$ says$_k^p$ $e$ $v$,
-$p_\downarrow \leq p$.
-  \end{lstlisting}
-\end{enumerate}
+%   \begin{lstlisting}[basicstyle=\color{BrickRed}\ttfamily]
+% $A$ says$_k^{p_\downarrow}$ $e$ $v$ :-
+% $A$ says$_k^p$ $e$ $v$,
+% $p_\downarrow \leq p$.
+%   \end{lstlisting}
+% \end{enumerate}
 
 \subsubsection*{Future Directions}
 
 I find the plausability work fascinating, but it is unlikely to progress much
-3further.  Adding a confidence to an authorization logic, rather than a more
+further.  Adding a confidence to an authorization logic, rather than a more
 general logic or agent system, seems like a sensible extension and for a limited
 set of use cases it seems to make sense for AppPAL to be able to reason with false
 positive rates of static analysis tools, and opinions; however I don't think
 there is enough here for this work to progress to a full paper or to develop
-more interesting uses given the time remaining.
+more interesting uses given the time remaining, and I don't believe in
+contributes greatly to my thesis.
 
 I think it is worth implementing the plausability as part of AppPAL as it helps
 further distinguish it from SecPAL, and even for a small set of use-cases it is
 still interesting.  Using very simple plausibility combinators will keep it
 quick to implement (if limited).  Implementing and testing can probably be done
-in less than a week, and a limited demonstration may be a nice addition to my thesis.
+in less than a week, and a limited demonstration may be a nice addition to my
+thesis, but extending it to a full paper seems excessive.
 
 \section{Thesis Progress}
 \label{sec:thesis}
 
 My thesis is due by the end of June 2017.
 
-A table of contents for the thesis is shown in \autoref{sec:thesis-outline}.
+A table of contents for the thesis is shown in \autoref{sec:thesis-outline}, and
+a schedule for completion from January is given in \autoref{sec:schedule}.
 Presently there are just under forty unedited pages written(including table of
 contents, bibliography, etc); mostly in chapters two and three. Since July, when
 I returned to fulltime study, I've been aiming to spend a day a week writing the
@@ -945,11 +1010,6 @@ five will build on several unpublished notes from this year.
     \item Overview of mobile devices and functionality
     \item Mobile Ecosystems
     \end{enumerate}
-  \item App Stores
-    \begin{enumerate}[{2.2.}1]
-    \item Different marketplaces
-    \item Distribution mechanisms
-    \end{enumerate}
   \item Authorization logics and Fine Grained Permission Systems
     \begin{enumerate}[{2.3.}1]
     \item PolicyMaker and Keynote
@@ -989,8 +1049,17 @@ five will build on several unpublished notes from this year.
   \item Finding Apps that fit privacy preferences
   \item Differences in App stores
     \begin{enumerate}[{4.3.}1]
+    \item Overview of different marketplaces
+      \begin{enumerate}[{4.3.1.}1]
+      \item Play Store
+      \item Amazon App Store
+      \item Yandex
+      \item Aptoide
+      \item 360 Mobile Assistant
+      \end{enumerate}
     \item Developer terms and conditions
     \item User terms and conditions
+    \item App store distribution mechanisms
     \end{enumerate}
   \item An AppPAL enhanced store
   \end{enumerate}
@@ -1022,6 +1091,7 @@ five will build on several unpublished notes from this year.
 \pagebreak
 
 \section{Schedule for Completion}
+\label{sec:schedule}
 \begin{center}
 %\begin{sideways}\centering
   \begin{ganttchart}{1}{24}
@@ -1067,3 +1137,6 @@ the final completed thesis by the end of June (when my funding ends).
 
 
 \end{document}
+
+%%% reftex-default-bibliography: ("report.bib")
+
