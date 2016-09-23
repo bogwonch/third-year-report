@@ -1,0 +1,15 @@
+digraph unreachability {
+        aAiI [shape=box label="'alice' says App isInstallable."];
+        aAiNM [shape=box label="'alice' says App isNotMalware."];
+        aAiR [shape=box label="'alice' says App isRecommended."];
+
+        paAiI_1 [shape=plaintext label="[1]"];
+        paAiI_2 [shape=plaintext label="[2]"];
+
+        aAiI -> paAiI_1;
+        paAiI_1 -> aAiNM;
+
+        aAiI -> paAiI_2;
+        paAiI_2 -> aAiNM;
+        paAiI_2 -> aAiR;
+}

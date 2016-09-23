@@ -545,10 +545,43 @@ dashed ones can be removed to remove the irrelevance.
 \begin{figure}
   \centering
   \includegraphics[width=0.5\linewidth]{./figures/irrelevance.png}
-  \caption{Proof graph showing irrelevance}
+  \caption{Proof graph showing irrelevance.}
   \label{fig:irrelevance}
 \end{figure}
 
+In contrast unreachability occurs when a fact does not take part in the minimal
+derivation tree of a fact.  As a simple example consider the following policy:
+
+\begin{lstlisting}
+'alice' says App isInstallable if App isNotMalware.
+'alice' says App isInstallable if App isNotMalware,  App isRecommended.
+\end{lstlisting}
+
+To detect unreachability for a given policy we again build the proof-graph (shown
+in \autoref{fig:unreachability}).  For each proof node we collect the facts
+(the leaves of the graph underneath it, which are the ground assertions from the
+AC\footnote{Or in the case of an unsatisfiable policy facts with variables that
+  cannot be unified with a ground fact.} in
+AppPAL).  If the facts for one proof node connected to a fact are a subset of
+the facts for another proof node, then the larger proof node, is unreachable it
+contains facts which are not in the minimal derivation tree.   In the case of
+\autoref{fig:unreachability}, the derivation-graph 2 is made redundant by
+derivation-graph 1 as it contains a subset of the facts.  This is a
+simplified example; in general facts lower in the tree may have multiple
+derivation trees, leading to multiple sets of facts being required for a fact
+that seems to have only one proof node.  Loops can also occur (where one fact
+depends on itself to prove itself).  This approach isn't complete, but it does
+identify several cases where an AppPAL policy may be redundant through
+unreachability.
+
+
+
+\begin{figure}
+  \centering
+  \includegraphics[width=0.5\linewidth]{./figures/unreachability.png}
+  \caption{Proof graph showing unreachability.}
+  \label{fig:unreachability}
+\end{figure}
 
 % Redundancy occurs when there are multiple rules that result in the same decision being
 % made.  Rules may depend on other rules, or ground facts.  One proof ($A$) is made
@@ -569,66 +602,66 @@ dashed ones can be removed to remove the irrelevance.
 %   \text{facts}(p_1) = \text{facts}(p_2)                                      & \implies \text{$G$ and $G^\prime$ have equivalent proofs.}
 % \end{align*}
 
-A simple example might be the policy shown in \autoref{fig:redundancy-graph-simple}.
-The second rule makes the first redundant.  We can represent the policy
-as a graph shown opposite the policy.  The goal (shown as a blue rectangle) has two routes
-to prove it true (each shown in ellipses).  Route 1 requires that the facts
-(shown in green rectangles) \lstinline!'x' says 'y' r,! and
-\lstinline!'x' says 'y' q.!, whereas route 0 only requires the
-latter fact.
+% A simple example might be the policy shown in \autoref{fig:redundancy-graph-simple}.
+% The second rule makes the first redundant.  We can represent the policy
+% as a graph shown opposite the policy.  The goal (shown as a blue rectangle) has two routes
+% to prove it true (each shown in ellipses).  Route 1 requires that the facts
+% (shown in green rectangles) \lstinline!'x' says 'y' r,! and
+% \lstinline!'x' says 'y' q.!, whereas route 0 only requires the
+% latter fact.
 
-\begin{figure}
-  \centering
-  \begin{minipage}{0.4\linewidth}
-    \begin{lstlisting}
-'x' says 'y' p
-  if 'y' q,
-     'y' r.
+% \begin{figure}
+%   \centering
+%   \begin{minipage}{0.4\linewidth}
+%     \begin{lstlisting}
+% 'x' says 'y' p
+%   if 'y' q,
+%      'y' r.
 
-'x' says 'y' p
-  if 'y' q.
-    \end{lstlisting}
-  \end{minipage}
-  \begin{minipage}{0.59\linewidth}
-    \scriptsize{}
-    \def\svgwidth{\columnwidth}
-    \import{figures/}{redundancy-simple.pdf_tex}
-  \end{minipage}
-  \caption{A simple policy shown as a graph.}
-  \label{fig:redundancy-graph-simple}
-\end{figure}
+% 'x' says 'y' p
+%   if 'y' q.
+%     \end{lstlisting}
+%   \end{minipage}
+%   \begin{minipage}{0.59\linewidth}
+%     \scriptsize{}
+%     \def\svgwidth{\columnwidth}
+%     \import{figures/}{redundancy-simple.pdf_tex}
+%   \end{minipage}
+%   \caption{A simple policy shown as a graph.}
+%   \label{fig:redundancy-graph-simple}
+% \end{figure}
 
-A more complex example is shown bellow:
-\begin{lstlisting}
-'x' says 'z' p if 'z' q.
-'x' says 'y' can-say 'z' p.
-'y' says 'z' p if 'z' q.
-'y' says 'x' can-say 'z' q.
-\end{lstlisting}
-Representing this policy as a graph we find it is more complex. Goals that
-depend on more than just green facts, are shown as black rectangles.  If a goal
-is used to prove another goal, and it itself only depends on green, ground,
-facts, then the node is marked to be flattened (red rectangle).  Its proofs are
-merged into the higher proof, and the flattened goal is removed from the higher
-proof.  This process is repeated until no more nodes can be flattened (shown
-twice in \autoref{fig:redundancy-complex}).  Once the graph is flattened we can
-identify that \lstinline!'x' says 'z' p! has a redundant means of proof (route
-0 only uses one of route 1's facts).  We can also see that all the proofs for
-\lstinline!'y' says 'z' q! and \lstinline!'y' says 'z' p! use the same facts.
-We report these statements as having equivalent proofs as the goals are not
-independent of each other (implying we could use fewer goals and still write
-equivalent policies).
-\begin{figure}
-  \centering\tiny
-  \framebox{\def\svgwidth{0.35\textwidth}1.
-    \import{figures/}{redundancy-complex-0.pdf_tex}}
-  \framebox{\def\svgwidth{0.55\textwidth}2.
-    \import{figures/}{redundancy-complex-1.pdf_tex}}
-  \framebox{\def\svgwidth{1.00\textwidth}3.
-    \import{figures/}{redundancy-complex-2.pdf_tex}}
-  \caption{Flattening a more complex policy.}
-  \label{fig:redundancy-complex}
-\end{figure}
+% A more complex example is shown bellow:
+% \begin{lstlisting}
+% 'x' says 'z' p if 'z' q.
+% 'x' says 'y' can-say 'z' p.
+% 'y' says 'z' p if 'z' q.
+% 'y' says 'x' can-say 'z' q.
+% \end{lstlisting}
+% Representing this policy as a graph we find it is more complex. Goals that
+% depend on more than just green facts, are shown as black rectangles.  If a goal
+% is used to prove another goal, and it itself only depends on green, ground,
+% facts, then the node is marked to be flattened (red rectangle).  Its proofs are
+% merged into the higher proof, and the flattened goal is removed from the higher
+% proof.  This process is repeated until no more nodes can be flattened (shown
+% twice in \autoref{fig:redundancy-complex}).  Once the graph is flattened we can
+% identify that \lstinline!'x' says 'z' p! has a redundant means of proof (route
+% 0 only uses one of route 1's facts).  We can also see that all the proofs for
+% \lstinline!'y' says 'z' q! and \lstinline!'y' says 'z' p! use the same facts.
+% We report these statements as having equivalent proofs as the goals are not
+% independent of each other (implying we could use fewer goals and still write
+% equivalent policies).
+% \begin{figure}
+%   \centering\tiny
+%   \framebox{\def\svgwidth{0.35\textwidth}1.
+%     \import{figures/}{redundancy-complex-0.pdf_tex}}
+%   \framebox{\def\svgwidth{0.55\textwidth}2.
+%     \import{figures/}{redundancy-complex-1.pdf_tex}}
+%   \framebox{\def\svgwidth{1.00\textwidth}3.
+%     \import{figures/}{redundancy-complex-2.pdf_tex}}
+%   \caption{Flattening a more complex policy.}
+%   \label{fig:redundancy-complex}
+% \end{figure}
 
 % To build the graphs, each statement we might want to prove (a goal) becomes a
 % node in the graph, its children are organised into sets of goals (a proof),
@@ -698,6 +731,7 @@ predicates should also never be true at the same time.  This may help to create
 partitions between certain facts and identify which are mutually exclusive even
 when the names would not trivially identify them.
 
+The redundancy checkers are somewhat buggy, and could be improved.
 I would also like to write tooling that can check that a policy uses well named
 predicates, and that everything is documented.  In \autoref{tab:byod-predicates}
 I documented what each of the thirty predicates meant.  I would like to be able
