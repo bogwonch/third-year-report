@@ -23,22 +23,22 @@
 \section{Introduction}
 \label{sec:introduction}
 
-Users can choose from a large range of apps for their phones. Their devices have
-access to a huge amount of personal information, and despite improvements giving
-users more control over what information they share, users still have to be
-careful to ensure their privacy and data-security preferences are followed.
-These devices are increasingly entering every part of their user's lives being
-used for work as well as for home.
+Users can choose from a large number of apps for their phones. Their devices
+have access to a huge amount of personal information, and despite improvements
+giving users more control over what information they
+share~\cite{_requesting_????,_system_????}, users still have to be careful to
+ensure their privacy and data-security preferences are followed. These devices
+are increasingly entering every part of their user's lives; being used for work
+as well as for home.
 
 The interactions between people and mobile devices requires an increasing number
 of trust relationships and policies---rules that describe how a device or user
 should behave. These trust relationships take the form of delegations of
-responsibilities to third parties, for example a user might delegate to a store
-to check that their apps are not malicious.
-
+responsibilities to third-parties. For example a user might delegate to an store
+to check that their apps are up to date and not malicious.
 
 These policies and trust relationships are often ad-hoc and informally
-specified. Users are not clear about how they want their apps to behave.
+specified. Users are not clear about how they want their apps to behave~\cite{lin_modeling_2014}.
 Businesses specify policies for users' devices in their workplace using natural
 language. Different app marketplaces have different policies describing how
 their users and developers can use their store and what rights they have, but
@@ -46,26 +46,28 @@ these are hidden behind long EULAs and developer agreements. The interactions
 between users, their devices, their employers, the stores they buy apps from and
 the apps themselves forms a vibrant mobile ecosystem of requirements,
 preferences and trust relationships for users who are often left to understand
-and enforce these relationships on their own.
+and enforce their policies on their own.
 
-Authorization logics are designed to express policies precisely, and make
-decisions on the basis of facts. They have been used to implement access control
-systems (deciding whether someone has access to a file or not).  By using these
-formal systems we can make informal policies in the mobile ecosystem
-more precise, we can start to automate enforcement and make comparisons between
-the different entities in the ecosystem on the basis of their roles and
-responsibilities.
+Authorization logics are designed to express policies precisely and make
+decisions on the basis of facts and have been used to implement access control
+systems~\cite{martin_logic_2003} (deciding whether someone has access to a file
+or not). By using these formal systems we can make informal policies in the
+mobile ecosystem more precise, we can start to automate enforcement and make
+precise comparisons between the different entities in the ecosystem and
+their roles and responsibilities.
 
 \subsection{Goals of this PhD}
 
 The goal of this work is to create a practical scheme for linking the high-level
 human policies in the mobile ecosystems, to the technical means for enforcing
-policies.
-The work will focus on the ecosystems surround Google's Android operating system, the
-largest mobile OS.  Unlike iOS (the OS for Apple's devices), there is a greater
-variation in the app stores available (Play Store, Amazon App Store, Yandex,
-Baidu and 360 Mobile Assistant to name but a few) as well as a broader amount of research
-on Android's apps and permission systems~\cite{felt_android_2012,chaudhuri_language-based_2009,lin_modeling_2014}.
+policies. The work will focus on the ecosystems surround Google's Android
+operating system, the largest mobile OS with over 80\% market
+share~\cite{https://www.statista.com/statistics/236027/global-smartphone-os-market-share-of-android/_android_????}.
+Unlike iOS (the OS for Apple's devices), there is a greater variation in the app
+stores available (Play Store, Amazon App Store, Yandex, Baidu and 360 Mobile
+Assistant to name but a few) as well as a broader amount of research on
+Android's apps and permission
+systems~\cite{felt_android_2012,chaudhuri_language-based_2009,lin_modeling_2014}.
 
 Much prior work has focused on the technical side of policies; extending Android
 with more sophisticated permission systems and complex enforcement
@@ -79,7 +81,7 @@ it to the problem of formalising the user level policies in mobile ecosystems
 Specifically I aim to show:
 
 \begin{quote}
-  \textbf{Thesis:}\itshape
+  \textbf{Thesis:}~\itshape
   Formal languages can model the natural language policies in the Android
   ecosystem, and in doing so help users, businesses, and developers make
   decisions on the basis of a declarative policy, rather than an informal
@@ -108,12 +110,13 @@ knowledge base to store results from static analysis checkers and metadata about
 apps. I surveyed user and developer policies present in stores and
 their distribution mechanisms. I also investigated whether users install apps
 matching their privacy preferences and presented a draft of a paper, that was
-later accepted and published~\cite{hallett_apppal_2016} and is included in the appendix.
+later accepted and published~\cite{hallett_apppal_2016}.
 
 This year I proposed working on a case-study looking at BYOD policies and
 developing a knowledge distribution protocol to define how AppPAL assertions
 should be distributed.  Work on the BYOD policies has resulted in a presentation
-at iFM's doctoral symposium~\cite{hallett_specifying_2016}, but there hasn't
+at iFM's doctoral symposium~\cite{hallett_specifying_2016} (the short paper is
+included in \autoref{sec:paper}), but there hasn't
 been progress working on a knowledge distribution protocol.  Instead, I have been
 worked on developing analysis tools for AppPAL policies and started creating a
 probabilistic variant of AppPAL.
@@ -121,22 +124,11 @@ probabilistic variant of AppPAL.
 \subsection{Typed AppPAL}
 \label{sec:types}
 
-\begin{lstlisting}[language=Python, float, caption={Procedure used to expand types from AppPAL into SecPAL.}]
-def expand_types(a: Assertion) -> Assertion:
-  for v in a.head.vars():
-    if v.type != None:
-      f = Fact(v, 'is'++str(v.type))
-      a.body.add(f)
-  return a
-\end{lstlisting}
-
 SecPAL's safety condition requires all variables in an assertion's head to be
 used in the body. When trying to describe policies a common pattern is to say a
-variable in an assertion belongs to a certain domain. For example someone who
-satisfies some property (for example they are a staff member) can make
-statements about apps.
-For example, Alice might be willing to let her friends say what apps are
-suitable for her children.  This could be expressed in SecPAL as follows:
+variable in an assertion belongs to a certain domain. For example, Alice might
+be willing to let her friends say what apps are suitable for her children. This
+could be expressed in SecPAL as follows:
 
 \begin{lstlisting}
 'alice' says Friend can-say App isSuitableFor(Child)
@@ -178,6 +170,16 @@ AppPAL we have started to give predicates meaning based on their name.
 This is expanded in the \autoref{sec:byod} where we describe other predicate
 prefixes that we use for specific purposes.
 
+
+\begin{lstlisting}[language=Python, float, caption={Procedure used to expand types from AppPAL into SecPAL.}]
+def expand_types(a: Assertion) -> Assertion:
+  for v in a.head.vars():
+    if v.type != None:
+      f = Fact(v, 'is'++str(v.type))
+      a.body.add(f)
+  return a
+\end{lstlisting}
+
 \subsection{BYOD Policies}
 \label{sec:byod}
 
@@ -197,15 +199,14 @@ their rules.  \ac{MDM} solutions are offered by a many companies, including IBM
 comparable set of features, namely:
 \begin{enumerate}
 \item App wrapping; where an app is rewritten to offer some addtional security
-  or network properties, though this is often limited to routing all the app's
-  network traffic through some company VPN.
+  or network properties. This is often limited to routing all the app's
+  network traffic through a VPN.
 \item Basic security configuration; where security settings can be turned on and
   off to require encryption (for example) on a device.
 \item Provisioning; where IT departments can install and update apps and
-  their configuration files
-\item Curated app store; where IT departments can white or black list apps.
+  their configuration files. Email and LDAP configuration is common.
+\item A curated app store; where IT departments can white or black list apps.
 \end{enumerate}
-
 
 
 Whilst \ac{MDM} software can enforce some policies; having an \ac{MDM} package
@@ -218,7 +219,7 @@ policies are typically more complex, noted that:
 
 \begin{quote}
   ``an approach toward educating the users instead of trying to control the
-  technology may be more practical in the short term.''~\cite{moyer_managing_2013}
+  technology may be more practical\ldots''~\cite{moyer_managing_2013}
 \end{quote}
 
 The tension between \ac{MDM} software and having something that employees can
@@ -226,9 +227,9 @@ understand has possibly led to many BYOD policies being published using natural
 language. Whilst there has been much research on the \emph{technical} means to
 enforce BYOD
 policies~\cite{martinelli_enhancing_2016,armando_enabling_2014,costantino_towards_2013}
-there has been little work comparing the natural languages of the policies in an
-effort to find the common idioms and requirements the companies want to enforce,
-as well as making precise comparisons between policies.
+there has been little work linking the natural languages of the policies to the
+implementation used to enforce the rules, as well as making precise comparisons
+between policies.
 
 I have taken policies from five different sources as part of a case study into
 the rules and idioms used in BYOD policies.  One is from the SANS
@@ -295,7 +296,7 @@ policies.
 
 \begin{table}
   \centering\footnotesize
-  \newcommand{\pform}[3]{\textit{#1}~\textbf{#2}#3}
+  \newcommand{\pform}[3]{\textsf{#1}~\texttt{\textbf{#2}#3}}
   \begin{tabular}{l p{0.5\linewidth}}
     \toprule
     Prefix                            & Meaning                                                                     \\
@@ -379,14 +380,14 @@ as~\cite{alon_levy_equivalence_1993}:
 
 SecPAL does not necessarily\footnote{It is implementation dependant. If a
   translation to Datalog$^C$ was used as suggested by
-  Becker~\cite{becker_secpal:_2010} then it might.} splits it's assertion
-  context into an EDB (extinsional database, essentially the ground facts) and
+  Becker~\cite{becker_secpal:_2010} then it might.} split it's assertion
+  context into an EDB (extensional database, essentially the ground facts) and
   IDB (intensional database, relations defined by rules).  If a Datalog
   predicate is taken as a SecPAL goal, a Datalog program is taken as a number
   of SecPAL assertions, and the EDB is taken as AppPAL ground facts (i.e.
   assertions with no conditionals) then the definition is equivalent.
 
-For example of satisfiability, consider the following snippet taken from the
+For an example of satisfiability, consider the following snippet taken from the
 NHS policy described in \autoref{sec:byod}.  The rule described in the policy
 is that an app must be approved by the \emph{integrated governance commitee} as
 well as by either the \emph{care and clinical policies group} as well as the
@@ -574,7 +575,12 @@ depends on itself to prove itself).  This approach isn't complete, but it does
 identify several cases where an AppPAL policy may be redundant through
 unreachability.
 
-
+\begin{lstlisting}[float, caption={Output of AppPAL when checking a policy with unreachability.}]
+java -jar Lint.jar --redundancy unreachable.policy
+[I]: loaded 1/1 files of 2 assertions
+[I]: flattened 0 node(s)
+[W]: 'alice' says App isInstallable. has unreachable derivation trees.
+\end{lstlisting}
 
 \begin{figure}
   \centering
@@ -731,32 +737,30 @@ predicates should also never be true at the same time.  This may help to create
 partitions between certain facts and identify which are mutually exclusive even
 when the names would not trivially identify them.
 
-The redundancy checkers are somewhat buggy, and could be improved.
-I would also like to write tooling that can check that a policy uses well named
-predicates, and that everything is documented.  In \autoref{tab:byod-predicates}
-I documented what each of the thirty predicates meant.  I would like to be able
-to have a schema that can produce these tables automatically, as well as be able to
-check that a policy only uses predicates from them.  This is technically
-trivial, but is worthwhile as it helps with documentation and can spot mistakes
-in policies, such as spelling mistakes in predicates and constants.\footnote{This is
-  especially common when dealing with hyphens in constants.  If copied from a
-  PDF document the hyphens are sometimes changed to dashes which look identical
-  but are counted as a different character.  AppPAL supports unicode, so they
-  are parsed correctly but are different symbols.  This was an absolute
-  nightmare to debug.}
+The redundancy checkers are somewhat buggy, and could be improved.  I would
+also like to write tooling that can check that a policy uses well named
+predicates, and that everything is documented.  In
+\autoref{tab:byod-predicates} I documented what each of the thirty predicates
+meant.  I would like to be able to have a schema that can produce these tables
+automatically, as well as be able to check that a policy only uses predicates
+from them.  This is technically trivial, but is worthwhile as it helps with
+documentation and can spot mistakes in policies, such as spelling mistakes in
+predicates and constants.\footnote{This is especially common when dealing with
+  hyphens in constants.  If copied from a PDF document the hyphens are
+  sometimes changed to unicode-dashes which look identical but are counted as a
+different character.  AppPAL supports unicode, so they are parsed correctly but
+are different symbols.  This was an absolute nightmare to debug.}
 
 In \autoref{sec:byod} I mentioned that I have tools for visualising policies.  I
 would also like to extend these to produce nicer diagrams than the Graphviz
-diagrams I currently produce which require explanation.
+diagrams I currently produce which require explanation.  
 
-I do not believe there is enough work here for a full paper.  If AppPAL was a
-commonly used authorization language then this might be interesting, if I framed
-it as SecPAL analysis tools (which is much better known but still somewhat
-obscure) then it might be interesting to a workshop on authorization logics or
-policy languages.   To a general crowd similar ideas have been shown with the
-XACML authorization language (which is well known if overly-complex, poorly
-specified, and undecidable).  I do believe this work is important to continue as
-it gives AppPAL policies the ability to be more than just another authorization
+I do not believe there is enough work here for a full paper because there is
+little novelty in porting decades old analysis techniques to a variant of an
+existing language that reduces to Datalog.  If this was combined with the BYOD work and I could show that I can detect AppPAL policy problems automatically then it would be interesting, but as it stands the BYOD policies are very simple.   Similar ideas have been shown with Datalog and the XACML authorization
+language~\cite{ramli_detecting_2015} (which is well known if overly-complex, poorly specified, and
+undecidable).  I do believe this work is important to continue as it gives
+AppPAL policies the ability to be more than just another authorization
 language. It lets AppPAL not only describe policies in mobile ecosystems but
 potentially identify when those policies are at fault.
 
@@ -976,7 +980,7 @@ them, using Datalog$^C$~\cite{li_datalog_2003}.
 
 \subsubsection*{Future Directions}
 
-I find the plausability work fascinating, but it is unlikely to progress much
+The plausability work is unlikely to progress much
 further.  Adding a confidence to an authorization logic, rather than a more
 general logic or agent system, seems like a sensible extension and for a limited
 set of use cases it seems to make sense for AppPAL to be able to reason with false
@@ -1025,6 +1029,8 @@ taken from earlier yearly reports.  The sections on users and apps will build on
 work from my paper at ESSoS~\cite{hallett_apppal_2016}, and the work in chapter
 five will build on several unpublished notes from this year.
 
+
+
 \bibliographystyle{plain}
 \bibliography{report}
 
@@ -1072,6 +1078,13 @@ five will build on several unpublished notes from this year.
     \end{enumerate}
   \item Examples of AppPAL
   \item Implementation
+  \item Inferring problems with AppPAL policies automatically
+    \begin{enumerate}[{3.4.}1]
+    \item Satisfiability
+    \item Redundancy
+    \item Contradiction
+    \item Schemas
+    \end{enumerate}
   \end{enumerate}
 \item Apps and App Stores
   \begin{enumerate}[4.1]
@@ -1112,13 +1125,6 @@ five will build on several unpublished notes from this year.
     \item Precisely comparing BYOD policies
     \item BYOD idioms in AppPAL
     \end{enumerate}
-  \item Inferring problems with AppPAL policies automatically
-    \begin{enumerate}[5.1.3]
-    \item Satisfiability
-    \item Redundancy
-    \item Contradiction
-    \item Schemas
-    \end{enumerate}
   \end{enumerate}
 \item Conclusions
 \end{enumerate}
@@ -1155,17 +1161,25 @@ Shown above is a Gantt chart for how I expect to spend my time from January
 writing the thesis.  I have split the writing into three stages: first draft,
 first edit second edit, each with a gap between to let me collect feedback.
 
-I have also kept January and February relatively quiet as I will have a newborn baby to
-look after, and I don't know how this will affect my work. Assuming it isn't
-doesn't slow me down too much then I can always press on with other writing and
-move the start dates back.  If it does slow my work down, however, then at least
-I have planned for it.
-
 I am aiming to have a near-complete first draft ready by the start of May, and
-the final completed thesis by the end of June (when my funding ends).
+the final completed thesis by the end of June (when my funding ends). As
+mentioned in \autoref{sec:thesis} some work has started in most chapters, and I
+intend to get more done by the start of January.  This schedule is,
+essentially, a worst case schedule.  Ideally work on some chapters should
+commence earlier than planned, and it may not be as linear as prescribed here
+and some chapters have already been started.
+
+I have also kept January and February relatively quiet as I will have a newborn
+baby to look after, and I don't know how this will affect my work. Assuming it
+isn't doesn't slow me down too much then I can always press on with other
+writing and move the start dates back.  If it does slow my work down, however,
+then at least I have planned for it.  From my perspective it is better to have
+a strict schedule about when things need to be done (or at least be being
+reviewed) than give overly optimistic deadlines and miss them.
 
 \pagebreak
 \section{Doctoral Symposium Paper from iFM}
+\label{sec:paper}
 \includepdf[pages=-]{ifm-ds.pdf}
 
 
